@@ -807,76 +807,144 @@ tr:last-child td{border-bottom:none}
     <div class="page" id="page-complaints">
       <div class="page-header">
         <div class="page-title">ðŸ“‚ All Complaints</div>
-        <div class="page-sub">Browse, filter and manage all complaint records.</div>
+        <div class="page-sub">Browse, filter, sort and manage all complaint records.</div>
       </div>
-      <div class="demo-banner">âš  <strong>SAMPLE DATA</strong> â€” Records shown are for demonstration only.</div>
+      <div class="demo-banner">âš  <strong>DEMO DATA</strong> â€” Records are for demonstration. Status changes update in-session state only.</div>
 
-      <!-- Filter Bar -->
-      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
-        <span style="font-size:12px;font-weight:700;color:var(--navy)">ðŸ” Filters:</span>
-        <select id="f-status" onchange="renderComplaints()" style="border:1px solid #d0d7de;border-radius:7px;padding:5px 10px;font-size:13px">
-          <option value="">All Status</option>
-          <option>New</option><option>Open</option><option>In Progress</option><option>Resolved</option><option>Closed</option><option>Overdue</option>
-        </select>
-        <select id="f-cat" onchange="renderComplaints()" style="border:1px solid #d0d7de;border-radius:7px;padding:5px 10px;font-size:13px">
-          <option value="">All Categories</option>
-          <option>Facilities</option><option>Customer Service</option><option>ICT / System</option>
-          <option>Finance / Billing</option><option>Staff Conduct / Integrity</option><option>Safety</option><option>Other</option>
-        </select>
-        <select id="f-pri" onchange="renderComplaints()" style="border:1px solid #d0d7de;border-radius:7px;padding:5px 10px;font-size:13px">
-          <option value="">All Priority</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option>
-        </select>
-        <input id="f-search" placeholder="ðŸ”Ž Search ID or keyword..." onkeyup="renderComplaints()" style="border:1px solid #d0d7de;border-radius:7px;padding:5px 12px;font-size:13px;min-width:200px"/>
-        <button class="btn btn-secondary btn-sm" onclick="clearFilters()">âœ• Reset</button>
-        <div style="margin-left:auto;font-size:12px;color:var(--muted)">Showing <span id="complaint-count">0</span> records</div>
+      <!-- Filter & Sort Bar -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px">
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px">
+          <span style="font-size:12px;font-weight:700;color:var(--navy)">ðŸ” Search &amp; Filter</span>
+          <input id="f-search" placeholder="Search ref no. or title..." oninput="renderComplaints()" style="flex:1;min-width:180px;border:1px solid #d0d7de;border-radius:7px;padding:6px 12px;font-size:13px"/>
+          <button class="btn btn-secondary btn-sm" onclick="clearFilters()">âœ• Reset</button>
+          <div style="margin-left:auto;font-size:12px;color:var(--muted)">Showing <strong id="complaint-count">0</strong> of <span id="complaint-total">0</span></div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+          <select id="f-status" onchange="renderComplaints()" style="border:1px solid #d0d7de;border-radius:7px;padding:5px 10px;font-size:12px">
+            <option value="">All Status</option>
+            <option>New</option><option>Under Review</option><option>In Progress</option>
+            <option>Awaiting Response</option><option>Resolved</option><option>Closed</option><option>Reopened</option>
+          </select>
+          <select id="f-cat" onchange="renderComplaints()" style="border:1px solid #d0d7de;border-radius:7px;padding:5px 10px;font-size:12px">
+            <option value="">All Categories</option>
+            <option>Facilities</option><option>Customer Service</option><option>ICT / System</option>
+            <option>Finance / Billing</option><option>Staff Conduct / Integrity</option><option>Safety</option><option>Other</option>
+          </select>
+          <select id="f-pri" onchange="renderComplaints()" style="border:1px solid #d0d7de;border-radius:7px;padding:5px 10px;font-size:12px">
+            <option value="">All Priority</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option>
+          </select>
+          <select id="f-officer" onchange="renderComplaints()" style="border:1px solid #d0d7de;border-radius:7px;padding:5px 10px;font-size:12px">
+            <option value="">All Officers</option>
+            <option>Facilities Mgmt</option><option>IT Support Team</option><option>IT Support</option>
+            <option>HR Department</option><option>Finance Unit</option><option>Safety Officer</option>
+            <option>Integrity Unit</option>
+          </select>
+          <select id="f-conf" onchange="renderComplaints()" style="border:1px solid #d0d7de;border-radius:7px;padding:5px 10px;font-size:12px">
+            <option value="">All Levels</option><option value="normal">Normal</option><option value="conf">Confidential</option>
+          </select>
+          <label style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px">From
+            <input type="date" id="f-date-from" onchange="renderComplaints()" style="border:1px solid #d0d7de;border-radius:6px;padding:4px 8px;font-size:12px"/>
+          </label>
+          <label style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px">To
+            <input type="date" id="f-date-to" onchange="renderComplaints()" style="border:1px solid #d0d7de;border-radius:6px;padding:4px 8px;font-size:12px"/>
+          </label>
+          <select id="f-sort" onchange="renderComplaints()" style="border:1px solid #d0d7de;border-radius:7px;padding:5px 10px;font-size:12px">
+            <option value="date-desc">Newest First</option>
+            <option value="date-asc">Oldest First</option>
+            <option value="priority">Priority (Criticalâ†’Low)</option>
+            <option value="status">Status</option>
+            <option value="updated">Last Updated</option>
+          </select>
+        </div>
       </div>
 
-      <div class="tbl-wrap section">
-        <table id="complaints-table" style="border-radius:12px;overflow:hidden"></table>
+      <!-- Table -->
+      <div class="section" style="overflow:visible">
+        <div class="tbl-wrap">
+          <table id="complaints-table"></table>
+        </div>
+        <!-- Pagination -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid var(--border);flex-wrap:wrap;gap:8px">
+          <div style="font-size:12px;color:var(--muted)">Page <span id="page-cur">1</span> of <span id="page-total">1</span></div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-secondary btn-sm" id="page-prev" onclick="changePage(-1)">â† Prev</button>
+            <div id="page-nums" style="display:flex;gap:4px"></div>
+            <button class="btn btn-secondary btn-sm" id="page-next" onclick="changePage(1)">Next â†’</button>
+          </div>
+          <div style="font-size:12px;color:var(--muted)">
+            Rows per page:
+            <select id="page-size" onchange="renderComplaints()" style="border:1px solid #d0d7de;border-radius:5px;padding:3px 8px;font-size:12px;margin-left:4px">
+              <option value="10" selected>10</option><option value="20">20</option><option value="50">50</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div><!-- /complaints -->
 
     <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â• PAGE: TRACK COMPLAINT â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
     <div class="page" id="page-track">
       <div class="page-header">
-        <div class="page-title">ðŸ” Track Complaint</div>
-        <div class="page-sub">Enter your complaint ID or email to track status.</div>
+        <div class="page-title">ðŸ” Track Your Complaint</div>
+        <div class="page-sub">Enter your complaint reference number to see the current status and progress.</div>
       </div>
 
-      <div class="form-section" style="max-width:560px">
-        <h3>ðŸ”Ž Search Complaint</h3>
+      <div class="alert alert-blue" style="margin-bottom:16px;max-width:700px">
+        <span class="alert-icon">â„¹ï¸</span>
+        <div style="font-size:12px"><strong>Privacy note:</strong> This view shows only publicly visible status updates. Internal notes, assigned officer details and confidential attachments are not displayed here. Tracking works within this session only â€” persistent cross-device tracking requires backend storage.</div>
+      </div>
+
+      <div class="form-section" style="max-width:620px">
+        <h3>ðŸ”Ž Find Your Complaint</h3>
         <div style="display:flex;gap:10px">
-          <input id="track-input" placeholder="e.g. ADU-2025-047 or your email" style="flex:1;border:1px solid #d0d7de;border-radius:8px;padding:9px 14px;font-size:14px" onkeydown="if(event.key==='Enter')trackSearch()"/>
-          <button class="btn btn-teal" onclick="trackSearch()">Track</button>
+          <input id="track-input" placeholder="Enter reference number â€” e.g. ADU-2025-047 or EA-2026-0001" style="flex:1;border:1px solid #d0d7de;border-radius:8px;padding:10px 14px;font-size:14px" onkeydown="if(event.key==='Enter')trackSearch()"/>
+          <button class="btn btn-teal" onclick="trackSearch()">Track â†’</button>
         </div>
-        <div class="form-hint" style="margin-top:8px">Try: ADU-2025-047 or ADU-2025-088</div>
+        <div class="form-hint" style="margin-top:8px">ðŸ’¡ Try: <strong>ADU-2025-047</strong> Â· <strong>ADU-2025-088</strong> Â· <strong>ADU-2025-081</strong> Â· <strong>ADU-2025-001</strong></div>
       </div>
 
-      <div id="track-result" style="display:none">
-        <div class="section">
-          <div class="section-header">
-            <div class="section-title" id="track-title">Complaint Detail</div>
-            <div id="track-status-badge"></div>
+      <div id="track-result" style="display:none;max-width:800px">
+
+        <!-- Status banner -->
+        <div id="track-status-banner" style="border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap"></div>
+
+        <div class="grid-2" style="margin-bottom:0">
+          <!-- Left: complaint info -->
+          <div class="section" style="margin-bottom:16px">
+            <div class="section-header"><div class="section-title">ðŸ“‹ Complaint Information</div></div>
+            <div class="section-body" id="track-info"></div>
           </div>
+          <!-- Right: public updates -->
+          <div class="section" style="margin-bottom:16px">
+            <div class="section-header"><div class="section-title">ðŸ“¢ Public Updates</div></div>
+            <div class="section-body" id="track-updates"></div>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="section" style="margin-bottom:16px">
+          <div class="section-header"><div class="section-title">ðŸ“ Status Timeline</div></div>
           <div class="section-body">
-            <div class="grid-2" style="margin-bottom:16px">
-              <div style="background:#f8fafc;border-radius:8px;padding:14px">
-                <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Complaint Info</div>
-                <div id="track-info"></div>
-              </div>
-              <div style="background:#f8fafc;border-radius:8px;padding:14px">
-                <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Assignment</div>
-                <div id="track-assign"></div>
-              </div>
-            </div>
-            <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">ðŸ“ Status Timeline</div>
             <div class="timeline" id="track-timeline"></div>
           </div>
         </div>
+
+        <!-- Next action -->
+        <div id="track-next-action" style="display:none" class="alert alert-blue">
+          <span class="alert-icon">ðŸ‘‰</span>
+          <div id="track-next-text"></div>
+        </div>
+
       </div>
 
-      <div id="track-not-found" style="display:none">
-        <div class="alert alert-amber"><span class="alert-icon">âš ï¸</span><div>No complaint found with that ID or email. Please check and try again, or <button class="btn btn-teal btn-sm" onclick="nav('submit',null)" style="margin-left:4px">submit a new complaint</button>.</div></div>
+      <div id="track-not-found" style="display:none;max-width:620px">
+        <div class="alert alert-amber">
+          <span class="alert-icon">âš ï¸</span>
+          <div>
+            <strong>No complaint found</strong> with reference <strong id="track-searched-ref"></strong>.<br>
+            <span style="font-size:12px">Check the reference number and try again. Reference numbers look like <em>ADU-2025-047</em> or <em>EA-2026-0001</em>.</span><br>
+            <button class="btn btn-teal btn-sm" onclick="nav('submit',null)" style="margin-top:8px">Submit a New Complaint</button>
+          </div>
+        </div>
       </div>
     </div><!-- /track -->
 
@@ -1118,23 +1186,90 @@ tr:last-child td{border-bottom:none}
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SAMPLE DATA
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+// Status workflow transition map
+const STATUS_TRANSITIONS = {
+  'New':               ['Under Review'],
+  'Under Review':      ['In Progress','Resolved'],
+  'In Progress':       ['Awaiting Response','Resolved'],
+  'Awaiting Response': ['In Progress','Resolved','Closed'],
+  'Resolved':          ['Closed','Reopened'],
+  'Closed':            ['Reopened'],
+  'Reopened':          ['In Progress'],
+};
+function getAllowedTransitions(s){ return STATUS_TRANSITIONS[s]||[]; }
+
+// Normalise legacy status values from older sessions
+function normaliseStatus(s){
+  const m={'Overdue':'In Progress','Open':'Under Review'};
+  return m[s]||s;
+}
+
 const COMPLAINTS = [
-  {id:'ADU-2025-001',title:'Broken classroom chairs in Block A, Room 102',category:'Facilities',priority:'High',status:'Resolved',date:'2025-01-08',complainant:'Nurul Ain binti Yusof',dept:'Dept. of Commerce',location:'Block A, Room 102',desc:'Multiple chairs in the classroom are broken and pose a safety hazard to students. The backrests are detached and legs are unstable.',assigned:'Mohd Hafiz (Facilities)',resolvedDate:'2025-01-12',sla:5,daysUsed:4,confidential:false},
-  {id:'ADU-2025-008',title:'LMS system inaccessible during exam registration',category:'ICT / System',priority:'Critical',status:'Resolved',date:'2025-01-15',complainant:'Ahmad Firdaus bin Razali',dept:'IT Services',location:'Online / LMS',desc:'Students were unable to access the LMS portal for exam registration for over 6 hours. This caused significant stress.',assigned:'IT Support Team',resolvedDate:'2025-01-16',sla:1,daysUsed:1,confidential:false},
-  {id:'ADU-2025-015',title:'Unprofessional conduct by counter staff at Admin Block',category:'Customer Service',priority:'Medium',status:'In Progress',date:'2025-02-03',complainant:'Siti Rahayu binti Karim',dept:'General',location:'Admin Block Counter',desc:'Counter staff were rude and dismissive when inquiring about fee payment. The staff member refused to provide their name.',assigned:'HR Department',resolvedDate:null,sla:5,daysUsed:14,confidential:false},
-  {id:'ADU-2025-022',title:'Faulty water supply in male dormitory Block D',category:'Facilities',priority:'High',status:'Resolved',date:'2025-02-14',complainant:'Haziq bin Rahim',dept:'Student Affairs',location:'Block D Dormitory',desc:'No water supply in male dormitory Block D for 3 consecutive days. Residents unable to shower or use toilet facilities.',assigned:'Facilities Mgmt',resolvedDate:'2025-02-17',sla:3,daysUsed:3,confidential:false},
-  {id:'ADU-2025-031',title:'Incorrect billing on student fee statement',category:'Finance / Billing',priority:'High',status:'Resolved',date:'2025-03-01',complainant:'Zulaikha binti Hassan',dept:'Finance',location:'Finance Office',desc:'Fee statement shows an additional RM800 charge for a course that the student did not register for.',assigned:'Finance Unit',resolvedDate:'2025-03-04',sla:5,daysUsed:3,confidential:false},
-  {id:'ADU-2025-038',title:'Air-conditioning broken â€” Lecture Hall 3',category:'Facilities',priority:'High',status:'In Progress',date:'2025-03-15',complainant:'Dr. Amirah Zulkifli',dept:'Dept. of Commerce',location:'Lecture Hall 3',desc:'Air-conditioning unit in Lecture Hall 3 has been non-functional for 2 weeks. Temperature inside reaches 35Â°C during afternoon sessions.',assigned:'Facilities Mgmt',resolvedDate:null,sla:5,daysUsed:21,confidential:false},
-  {id:'ADU-2025-047',title:'Parking area flood during rain â€” unsafe conditions',category:'Safety',priority:'High',status:'In Progress',date:'2025-04-02',complainant:'Rashdan bin Mansor',dept:'General',location:'Main Parking, Zone B',desc:'The main parking area Zone B floods severely during moderate rain, making it unsafe and inaccessible. Vehicles have been damaged.',assigned:'Safety Officer',resolvedDate:null,sla:3,daysUsed:5,confidential:false},
-  {id:'ADU-2025-055',title:'Photocopier machines out of order in library',category:'Facilities',priority:'Low',status:'Resolved',date:'2025-04-18',complainant:'Farhana binti Aziz',dept:'Library',location:'Main Library',desc:'Both photocopier machines on Level 1 of the library have been out of order for over a week. Students are unable to photocopy study materials.',assigned:'IT Support',resolvedDate:'2025-04-22',sla:10,daysUsed:4,confidential:false},
-  {id:'ADU-2025-062',title:'Finance officer refused to process late fee appeal',category:'Finance / Billing',priority:'Medium',status:'New',date:'2025-05-05',complainant:'Izzat bin Hakim',dept:'Finance',location:'Finance Counter',desc:'The finance officer refused to process a legitimate late fee appeal without providing justification, citing an unwritten policy.',assigned:null,resolvedDate:null,sla:5,daysUsed:1,confidential:false},
-  {id:'ADU-2025-071',title:'Lift malfunction in Block B â€” no maintenance in 3 weeks',category:'Facilities',priority:'High',status:'In Progress',date:'2025-05-20',complainant:'Maziana binti Azman',dept:'Student Affairs',location:'Block B, Lift 2',desc:'Lift in Block B has been malfunctioning intermittently for 3 weeks. It stops between floors, posing a serious safety risk.',assigned:'Facilities Mgmt',resolvedDate:null,sla:3,daysUsed:8,confidential:false},
-  {id:'ADU-2025-081',title:'LMS login failure for 45 students during mid-term exam',category:'ICT / System',priority:'Critical',status:'Overdue',date:'2025-06-01',complainant:'Mohd Nadzir bin Saad',dept:'Examinations',location:'Online / LMS',desc:'45 students were unable to log in to the LMS during the mid-term examination period, resulting in missed submissions.',assigned:'IT Support Team',resolvedDate:null,sla:1,daysUsed:6,confidential:false},
-  {id:'ADU-2025-088',title:'Broken air-conditioning â€” Block C Room 301',category:'Facilities',priority:'Critical',status:'Overdue',date:'2025-06-05',complainant:'Norhaslinda binti Ahmad',dept:'Dept. of Engineering',location:'Block C, Room 301',desc:'Air conditioning in Block C Room 301 has been completely non-functional for 8 days. Multiple reports submitted with no action.',assigned:'Facilities Mgmt',resolvedDate:null,sla:2,daysUsed:8,confidential:false},
-  {id:'ADU-2025-092',title:'Staff member used offensive language towards student',category:'Staff Conduct / Integrity',priority:'Critical',status:'In Progress',date:'2025-06-10',complainant:'Anonymous',dept:'General',location:'Faculty Office',desc:'A staff member reportedly used offensive and degrading language towards a student when the student inquired about examination results.',assigned:'Integrity Unit',resolvedDate:null,sla:2,daysUsed:2,confidential:true},
-  {id:'ADU-2025-097',title:'No streetlights in parking area â€” safety concern at night',category:'Safety',priority:'High',status:'New',date:'2025-06-12',complainant:'Khairul Anwar bin Ismail',dept:'Security',location:'Rear Parking Area',desc:'The rear parking area has no functional streetlights. Multiple students have reported feeling unsafe walking to their vehicles at night.',assigned:null,resolvedDate:null,sla:3,daysUsed:0,confidential:false},
-  {id:'ADU-2025-101',title:'Canteen food quality and hygiene standards',category:'Customer Service',priority:'Medium',status:'New',date:'2025-06-14',complainant:'Syafiqah binti Ramli',dept:'Student Affairs',location:'Main Canteen',desc:'Students have raised concerns about food quality, cleanliness of serving areas, and the temperature of served food in the main canteen.',assigned:null,resolvedDate:null,sla:5,daysUsed:0,confidential:false},
-  {id:'ADU-2025-105',title:'Hostel Wi-Fi extremely slow and unreliable',category:'ICT / System',priority:'High',status:'New',date:'2025-06-15',complainant:'Amirul Hazwan bin Raziff',dept:'IT Services',location:'Hostel Block E',desc:'Wi-Fi connectivity in Hostel Block E has been extremely slow since the start of the semester. Students cannot attend online lectures properly.',assigned:null,resolvedDate:null,sla:3,daysUsed:0,confidential:false},
+  {id:'ADU-2025-001',title:'Broken classroom chairs in Block A, Room 102',category:'Facilities',priority:'High',status:'Resolved',date:'2025-01-08',updatedDate:'2025-01-12',complainant:'Nurul Ain binti Yusof',dept:'Dept. of Commerce',location:'Block A, Room 102',desc:'Multiple chairs in the classroom are broken and pose a safety hazard to students. The backrests are detached and legs are unstable.',assigned:'Mohd Hafiz (Facilities)',resolvedDate:'2025-01-12',sla:5,daysUsed:4,confidential:false,confidentialLevel:'Normal',
+    statusHistory:[{status:'New',date:'2025-01-08',by:'System',note:'Complaint received.'},{status:'Under Review',date:'2025-01-09',by:'Admin',note:'Assigned to Facilities Mgmt.'},{status:'In Progress',date:'2025-01-10',by:'Mohd Hafiz',note:'Site inspection done. Replacement chairs ordered.'},{status:'Resolved',date:'2025-01-12',by:'Mohd Hafiz',note:'All broken chairs replaced.'}],
+    notes:[{by:'Mohd Hafiz',date:'2025-01-10',internal:true,text:'Ordered 8 replacement chairs from store room. ETA 2 days.'}],
+    publicUpdates:[{date:'2025-01-10',text:'Your complaint has been assigned and a site inspection is in progress.'},{date:'2025-01-12',text:'Resolved: Broken chairs in Block A Room 102 have been replaced. Thank you for your report.'}]},
+  {id:'ADU-2025-008',title:'LMS system inaccessible during exam registration',category:'ICT / System',priority:'Critical',status:'Resolved',date:'2025-01-15',updatedDate:'2025-01-16',complainant:'Ahmad Firdaus bin Razali',dept:'IT Services',location:'Online / LMS',desc:'Students were unable to access the LMS portal for exam registration for over 6 hours.',assigned:'IT Support Team',resolvedDate:'2025-01-16',sla:1,daysUsed:1,confidential:false,confidentialLevel:'Normal',
+    statusHistory:[{status:'New',date:'2025-01-15',by:'System',note:'Critical complaint received.'},{status:'Under Review',date:'2025-01-15',by:'Admin',note:'Escalated to IT Support Team.'},{status:'In Progress',date:'2025-01-15',by:'IT Support Team',note:'Server load issue identified.'},{status:'Resolved',date:'2025-01-16',by:'IT Support Team',note:'LMS server upgraded. Service restored.'}],
+    notes:[{by:'IT Support Team',date:'2025-01-15',internal:true,text:'Root cause: DB connection pool exhausted. Increased pool size to 500.'}],
+    publicUpdates:[{date:'2025-01-15',text:'We are aware of the LMS issue and our team is actively working to restore service.'},{date:'2025-01-16',text:'LMS access has been fully restored. We apologise for the inconvenience.'}]},
+  {id:'ADU-2025-015',title:'Unprofessional conduct by counter staff at Admin Block',category:'Customer Service',priority:'Medium',status:'In Progress',date:'2025-02-03',updatedDate:'2025-02-14',complainant:'Siti Rahayu binti Karim',dept:'General',location:'Admin Block Counter',desc:'Counter staff were rude and dismissive when inquiring about fee payment. The staff member refused to provide their name.',assigned:'HR Department',resolvedDate:null,sla:5,daysUsed:14,confidential:false,confidentialLevel:'Normal',
+    statusHistory:[{status:'New',date:'2025-02-03',by:'System',note:'Complaint received.'},{status:'Under Review',date:'2025-02-04',by:'Admin',note:'Assigned to HR Department.'},{status:'In Progress',date:'2025-02-10',by:'HR Department',note:'HR conducting interviews with admin counter staff.'}],
+    notes:[{by:'HR Department',date:'2025-02-10',internal:true,text:'CCTV footage requested. Staff identified â€” counselling session scheduled.'}],
+    publicUpdates:[{date:'2025-02-04',text:'Your complaint has been assigned to our HR Department for investigation.'},{date:'2025-02-10',text:'Investigation is in progress. We will update you within 5 working days.'}]},
+  {id:'ADU-2025-022',title:'Faulty water supply in male dormitory Block D',category:'Facilities',priority:'High',status:'Resolved',date:'2025-02-14',updatedDate:'2025-02-17',complainant:'Haziq bin Rahim',dept:'Student Affairs',location:'Block D Dormitory',desc:'No water supply in male dormitory Block D for 3 consecutive days.',assigned:'Facilities Mgmt',resolvedDate:'2025-02-17',sla:3,daysUsed:3,confidential:false,confidentialLevel:'Normal',
+    statusHistory:[{status:'New',date:'2025-02-14',by:'System',note:'Complaint received.'},{status:'Under Review',date:'2025-02-14',by:'Admin',note:'High priority â€” assigned to Facilities Mgmt.'},{status:'In Progress',date:'2025-02-15',by:'Facilities Mgmt',note:'Main valve blockage identified.'},{status:'Resolved',date:'2025-02-17',by:'Facilities Mgmt',note:'Blockage cleared. Water supply restored.'}],
+    notes:[],
+    publicUpdates:[{date:'2025-02-15',text:'A maintenance team has been dispatched to investigate the water supply issue.'},{date:'2025-02-17',text:'Water supply to Block D has been fully restored. Thank you for your patience.'}]},
+  {id:'ADU-2025-031',title:'Incorrect billing on student fee statement',category:'Finance / Billing',priority:'High',status:'Resolved',date:'2025-03-01',updatedDate:'2025-03-04',complainant:'Zulaikha binti Hassan',dept:'Finance',location:'Finance Office',desc:'Fee statement shows an additional RM800 charge for a course the student did not register for.',assigned:'Finance Unit',resolvedDate:'2025-03-04',sla:5,daysUsed:3,confidential:false,confidentialLevel:'Normal',
+    statusHistory:[{status:'New',date:'2025-03-01',by:'System',note:'Complaint received.'},{status:'Under Review',date:'2025-03-01',by:'Admin',note:'Assigned to Finance Unit.'},{status:'In Progress',date:'2025-03-02',by:'Finance Unit',note:'Erroneous charge confirmed.'},{status:'Resolved',date:'2025-03-04',by:'Finance Unit',note:'RM800 charge removed. Fee statement corrected.'}],
+    notes:[{by:'Finance Unit',date:'2025-03-02',internal:true,text:'System error caused duplicate course registration fee. Corrected in billing system.'}],
+    publicUpdates:[{date:'2025-03-02',text:'Our Finance Unit is reviewing your fee statement.'},{date:'2025-03-04',text:'Resolved: The incorrect charge of RM800 has been removed. Please verify your updated statement.'}]},
+  {id:'ADU-2025-038',title:'Air-conditioning broken â€” Lecture Hall 3',category:'Facilities',priority:'High',status:'Awaiting Response',date:'2025-03-15',updatedDate:'2025-04-02',complainant:'Dr. Amirah Zulkifli',dept:'Dept. of Commerce',location:'Lecture Hall 3',desc:'AC unit in Lecture Hall 3 has been non-functional for 2 weeks. Temperature reaches 35Â°C.',assigned:'Facilities Mgmt',resolvedDate:null,sla:5,daysUsed:21,confidential:false,confidentialLevel:'Normal',
+    statusHistory:[{status:'New',date:'2025-03-15',by:'System',note:'Complaint received.'},{status:'Under Review',date:'2025-03-16',by:'Admin',note:'Assigned to Facilities Mgmt.'},{status:'In Progress',date:'2025-03-18',by:'Facilities Mgmt',note:'Compressor replacement required. Procurement request submitted.'},{status:'Awaiting Response',date:'2025-04-02',by:'Facilities Mgmt',note:'Portable units arranged. Awaiting complainant confirmation.'}],
+    notes:[{by:'Facilities Mgmt',date:'2025-03-18',internal:true,text:'Compressor cost RM2,400. Procurement request submitted. ETA 2-3 weeks.'},{by:'Admin',date:'2025-04-02',internal:true,text:'Complainant contacted about temporary cooling arrangement.'}],
+    publicUpdates:[{date:'2025-03-18',text:'Our team has inspected the AC unit. A replacement part has been ordered. Temporary cooling will be arranged.'},{date:'2025-04-02',text:'Portable AC units have been arranged for Lecture Hall 3. Please confirm if this interim arrangement is acceptable.'}]},
+  {id:'ADU-2025-047',title:'Parking area flood during rain â€” unsafe conditions',category:'Safety',priority:'High',status:'In Progress',date:'2025-04-02',updatedDate:'2025-04-15',complainant:'Rashdan bin Mansor',dept:'General',location:'Main Parking, Zone B',desc:'Main parking Zone B floods severely during moderate rain. Vehicles have been damaged.',assigned:'Safety Officer',resolvedDate:null,sla:3,daysUsed:5,confidential:false,confidentialLevel:'Normal',
+    statusHistory:[{status:'New',date:'2025-04-02',by:'System',note:'Complaint received.'},{status:'Under Review',date:'2025-04-03',by:'Admin',note:'Assigned to Safety Officer.'},{status:'In Progress',date:'2025-04-05',by:'Safety Officer',note:'Site inspection done. Drainage blockage confirmed.'}],
+    notes:[{by:'Safety Officer',date:'2025-04-05',internal:true,text:'Three drain channels blocked with debris. Civil works team to clear and install warning signs.'}],
+    publicUpdates:[{date:'2025-04-03',text:'Your safety complaint has been assigned to our Safety Officer for urgent inspection.'},{date:'2025-04-05',text:'A site inspection has been conducted. Drainage clearance works are being arranged. Warning signs will be installed as an interim measure.'}]},
+  {id:'ADU-2025-055',title:'Photocopier machines out of order in library',category:'Facilities',priority:'Low',status:'Closed',date:'2025-04-18',updatedDate:'2025-04-25',complainant:'Farhana binti Aziz',dept:'Library',location:'Main Library',desc:'Both photocopiers on Level 1 of the library have been out of order for over a week.',assigned:'IT Support',resolvedDate:'2025-04-22',sla:10,daysUsed:4,confidential:false,confidentialLevel:'Normal',
+    statusHistory:[{status:'New',date:'2025-04-18',by:'System',note:'Complaint received.'},{status:'Under Review',date:'2025-04-18',by:'Admin',note:'Assigned to IT Support.'},{status:'In Progress',date:'2025-04-19',by:'IT Support',note:'Paper jam and ink cartridge issue found.'},{status:'Resolved',date:'2025-04-22',by:'IT Support',note:'Both copiers repaired and tested.'},{status:'Closed',date:'2025-04-25',by:'Admin',note:'Complainant satisfied. Case closed.'}],
+    notes:[],
+    publicUpdates:[{date:'2025-04-19',text:'A technician has been sent to inspect the photocopiers.'},{date:'2025-04-22',text:'Resolved: Both photocopier machines have been repaired and are now operational.'}]},
+  {id:'ADU-2025-062',title:'Finance officer refused to process late fee appeal',category:'Finance / Billing',priority:'Medium',status:'New',date:'2025-05-05',updatedDate:'2025-05-05',complainant:'Izzat bin Hakim',dept:'Finance',location:'Finance Counter',desc:'The finance officer refused to process a legitimate late fee appeal without justification.',assigned:null,resolvedDate:null,sla:5,daysUsed:1,confidential:false,confidentialLevel:'Normal',
+    statusHistory:[{status:'New',date:'2025-05-05',by:'System',note:'Complaint received.'}],
+    notes:[],
+    publicUpdates:[{date:'2025-05-05',text:'Your complaint has been received and will be assigned within 1 working day.'}]},
+  {id:'ADU-2025-071',title:'Lift malfunction in Block B â€” no maintenance in 3 weeks',category:'Facilities',priority:'High',status:'In Progress',date:'2025-05-20',updatedDate:'2025-05-25',complainant:'Maziana binti Azman',dept:'Student Affairs',location:'Block B, Lift 2',desc:'Lift in Block B malfunctioning for 3 weeks. Stops between floors â€” serious safety risk.',assigned:'Facilities Mgmt',resolvedDate:null,sla:3,daysUsed:8,confidential:false,confidentialLevel:'Normal',
+    statusHistory:[{status:'New',date:'2025-05-20',by:'System',note:'Complaint received.'},{status:'Under Review',date:'2025-05-21',by:'Admin',note:'Assigned â€” safety risk.'},{status:'In Progress',date:'2025-05-23',by:'Facilities Mgmt',note:'Control board fault identified. Replacement on order.'}],
+    notes:[{by:'Facilities Mgmt',date:'2025-05-23',internal:true,text:'Elevator control board replacement. ETA 5-7 days. Lift locked out of service.'}],
+    publicUpdates:[{date:'2025-05-21',text:'Your complaint has been assigned to Facilities Management as a high priority safety matter.'},{date:'2025-05-23',text:'Block B Lift 2 has been taken out of service while repairs are undertaken. We apologise for the inconvenience.'}]},
+  {id:'ADU-2025-081',title:'LMS login failure for 45 students during mid-term exam',category:'ICT / System',priority:'Critical',status:'In Progress',date:'2025-06-01',updatedDate:'2025-06-03',complainant:'Mohd Nadzir bin Saad',dept:'Examinations',location:'Online / LMS',desc:'45 students could not log in to LMS during the mid-term period. Missed submissions resulted.',assigned:'IT Support Team',resolvedDate:null,sla:1,daysUsed:6,confidential:false,confidentialLevel:'Normal',
+    statusHistory:[{status:'New',date:'2025-06-01',by:'System',note:'Critical complaint received.'},{status:'Under Review',date:'2025-06-01',by:'Admin',note:'Escalated immediately.'},{status:'In Progress',date:'2025-06-01',by:'IT Support Team',note:'Authentication server logs under review.'}],
+    notes:[{by:'IT Support Team',date:'2025-06-02',internal:true,text:'OAuth token expiry bug in latest LMS update. Patch in staging.'},{by:'Admin',date:'2025-06-03',internal:true,text:'Extensions granted to affected students.'}],
+    publicUpdates:[{date:'2025-06-01',text:'We are aware of the login failure and are treating this as a critical issue.'},{date:'2025-06-03',text:'Our IT team is finalising a fix. The Examinations Board has been notified and affected students will be accommodated.'}]},
+  {id:'ADU-2025-088',title:'Broken air-conditioning â€” Block C Room 301',category:'Facilities',priority:'Critical',status:'In Progress',date:'2025-06-05',updatedDate:'2025-06-08',complainant:'Norhaslinda binti Ahmad',dept:'Dept. of Engineering',location:'Block C, Room 301',desc:'AC in Block C Room 301 completely non-functional for 8 days. Multiple reports submitted with no action.',assigned:'Facilities Mgmt',resolvedDate:null,sla:2,daysUsed:8,confidential:false,confidentialLevel:'Normal',
+    statusHistory:[{status:'New',date:'2025-06-05',by:'System',note:'Complaint received.'},{status:'Under Review',date:'2025-06-05',by:'Admin',note:'Critical â€” assigned with escalation flag.'},{status:'In Progress',date:'2025-06-06',by:'Facilities Mgmt',note:'Total AC failure. Replacement unit ordered.'}],
+    notes:[{by:'Facilities Mgmt',date:'2025-06-06',internal:true,text:'Unit beyond repair. New unit RM4,800. Emergency procurement raised.'},{by:'Admin',date:'2025-06-08',internal:true,text:'Procurement approved. Installation within 5 working days.'}],
+    publicUpdates:[{date:'2025-06-06',text:'An emergency inspection has been conducted. A replacement unit has been ordered urgently.'},{date:'2025-06-08',text:'A new AC unit has been approved and will be installed within 5 working days. We sincerely apologise for the disruption.'}]},
+  {id:'ADU-2025-092',title:'Staff member used offensive language towards student',category:'Staff Conduct / Integrity',priority:'Critical',status:'In Progress',date:'2025-06-10',updatedDate:'2025-06-11',complainant:'Anonymous',dept:'General',location:'Faculty Office',desc:'A staff member reportedly used offensive language towards a student regarding examination results.',assigned:'Integrity Unit',resolvedDate:null,sla:2,daysUsed:2,confidential:true,confidentialLevel:'Highly Confidential',
+    statusHistory:[{status:'New',date:'2025-06-10',by:'System',note:'Highly Confidential complaint received.'},{status:'Under Review',date:'2025-06-10',by:'Head of Integrity',note:'Assigned to Integrity Unit.'},{status:'In Progress',date:'2025-06-11',by:'Integrity Unit',note:'Formal investigation opened.'}],
+    notes:[{by:'Integrity Unit',date:'2025-06-11',internal:true,text:'[RESTRICTED] Staff member identified. HR and Legal informed. Formal hearing to be scheduled.'}],
+    publicUpdates:[{date:'2025-06-10',text:'Your complaint has been received and is being handled confidentially by the appropriate unit.'},{date:'2025-06-11',text:'A formal investigation has been opened. You will be contacted if additional information is required.'}]},
+  {id:'ADU-2025-097',title:'No streetlights in parking area â€” safety concern at night',category:'Safety',priority:'High',status:'Under Review',date:'2025-06-12',updatedDate:'2025-06-13',complainant:'Khairul Anwar bin Ismail',dept:'Security',location:'Rear Parking Area',desc:'No functional streetlights in the rear parking area. Students feel unsafe at night.',assigned:'Safety Officer',resolvedDate:null,sla:3,daysUsed:0,confidential:false,confidentialLevel:'Normal',
+    statusHistory:[{status:'New',date:'2025-06-12',by:'System',note:'Complaint received.'},{status:'Under Review',date:'2025-06-13',by:'Admin',note:'Assigned to Safety Officer.'}],
+    notes:[],
+    publicUpdates:[{date:'2025-06-13',text:'Your complaint has been assigned to our Safety Officer for urgent assessment of the lighting situation.'}]},
+  {id:'ADU-2025-101',title:'Canteen food quality and hygiene standards',category:'Customer Service',priority:'Medium',status:'New',date:'2025-06-14',updatedDate:'2025-06-14',complainant:'Syafiqah binti Ramli',dept:'Student Affairs',location:'Main Canteen',desc:'Concerns about food quality, cleanliness of serving areas, and food temperature in the main canteen.',assigned:null,resolvedDate:null,sla:5,daysUsed:0,confidential:false,confidentialLevel:'Normal',
+    statusHistory:[{status:'New',date:'2025-06-14',by:'System',note:'Complaint received.'}],
+    notes:[],
+    publicUpdates:[{date:'2025-06-14',text:'Your complaint has been received and will be assigned within 1 working day.'}]},
+  {id:'ADU-2025-105',title:'Hostel Wi-Fi extremely slow and unreliable',category:'ICT / System',priority:'High',status:'New',date:'2025-06-15',updatedDate:'2025-06-15',complainant:'Amirul Hazwan bin Raziff',dept:'IT Services',location:'Hostel Block E',desc:'Wi-Fi in Hostel Block E extremely slow since semester start. Students cannot attend online lectures.',assigned:null,resolvedDate:null,sla:3,daysUsed:0,confidential:false,confidentialLevel:'Normal',
+    statusHistory:[{status:'New',date:'2025-06-15',by:'System',note:'Complaint received.'}],
+    notes:[],
+    publicUpdates:[{date:'2025-06-15',text:'Your complaint has been received. It will be assigned to the IT Support Team within 1 working day.'}]},
 ];
 
 const DOCUMENTS = [
@@ -1252,109 +1387,361 @@ function renderRecentTable(){
 }
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// ALL COMPLAINTS
+// ALL COMPLAINTS â€” filter, sort, paginate
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+let _cPage = 1;
+
+const PRIORITY_ORDER = {Critical:0,High:1,Medium:2,Low:3};
+const STATUS_ORDER = {New:0,'Under Review':1,'Reopened':2,'In Progress':3,'Awaiting Response':4,Resolved:5,Closed:6};
+
 function getFilteredComplaints(){
-  const s=document.getElementById('f-status')?.value||'';
-  const cat=document.getElementById('f-cat')?.value||'';
-  const pri=document.getElementById('f-pri')?.value||'';
-  const q=(document.getElementById('f-search')?.value||'').toLowerCase();
-  return COMPLAINTS.filter(c=>{
+  const s    = document.getElementById('f-status')?.value||'';
+  const cat  = document.getElementById('f-cat')?.value||'';
+  const pri  = document.getElementById('f-pri')?.value||'';
+  const off  = document.getElementById('f-officer')?.value||'';
+  const conf = document.getElementById('f-conf')?.value||'';
+  const df   = document.getElementById('f-date-from')?.value||'';
+  const dt   = document.getElementById('f-date-to')?.value||'';
+  const q    = (document.getElementById('f-search')?.value||'').toLowerCase();
+  const sort = document.getElementById('f-sort')?.value||'date-desc';
+
+  let data = COMPLAINTS.filter(c=>{
     if(s && c.status!==s) return false;
     if(cat && c.category!==cat) return false;
     if(pri && c.priority!==pri) return false;
-    if(q && !c.id.toLowerCase().includes(q) && !c.title.toLowerCase().includes(q) && !c.category.toLowerCase().includes(q)) return false;
+    if(off && c.assigned!==off) return false;
+    if(conf==='normal' && c.confidential) return false;
+    if(conf==='conf' && !c.confidential) return false;
+    if(df && c.date < df) return false;
+    if(dt && c.date > dt) return false;
+    if(q && !c.id.toLowerCase().includes(q) && !c.title.toLowerCase().includes(q)
+         && !(c.complainant||'').toLowerCase().includes(q)
+         && !c.category.toLowerCase().includes(q)) return false;
     return true;
   });
+
+  data.sort((a,b)=>{
+    if(sort==='date-asc')  return a.date.localeCompare(b.date);
+    if(sort==='date-desc') return b.date.localeCompare(a.date);
+    if(sort==='priority')  return (PRIORITY_ORDER[a.priority]??9)-(PRIORITY_ORDER[b.priority]??9);
+    if(sort==='status')    return (STATUS_ORDER[a.status]??9)-(STATUS_ORDER[b.status]??9);
+    if(sort==='updated')   return (b.updatedDate||b.date).localeCompare(a.updatedDate||a.date);
+    return 0;
+  });
+  return data;
 }
+
 function clearFilters(){
-  document.getElementById('f-status').value='';
-  document.getElementById('f-cat').value='';
-  document.getElementById('f-pri').value='';
+  ['f-status','f-cat','f-pri','f-officer','f-conf','f-date-from','f-date-to'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
   document.getElementById('f-search').value='';
+  document.getElementById('f-sort').value='date-desc';
+  _cPage=1;
   renderComplaints();
 }
+
+function changePage(dir){
+  const total=parseInt(document.getElementById('page-total').textContent)||1;
+  _cPage=Math.max(1,Math.min(total,_cPage+dir));
+  renderComplaints();
+}
+
+function confBadge(c){
+  if(!c.confidential) return '';
+  const lvl=c.confidentialLevel||'Confidential';
+  if(lvl==='Highly Confidential') return '<span class="badge" style="background:#fee2e2;color:#991b1b;font-size:9px;margin-left:4px">ðŸ” HC</span>';
+  return '<span class="badge b-overdue" style="font-size:9px;margin-left:4px">ðŸ”’ CONF</span>';
+}
+
+function isOverdue(c){
+  return !['Resolved','Closed'].includes(c.status) && c.daysUsed > c.sla;
+}
+
 function renderComplaints(){
-  const data=getFilteredComplaints();
-  document.getElementById('complaint-count').textContent=data.length;
+  const all   = getFilteredComplaints();
+  const pgSize= parseInt(document.getElementById('page-size')?.value||10);
+  const total = Math.max(1,Math.ceil(all.length/pgSize));
+  _cPage      = Math.min(_cPage,total);
+  const data  = all.slice((_cPage-1)*pgSize, _cPage*pgSize);
+
+  document.getElementById('complaint-count').textContent = all.length;
+  document.getElementById('complaint-total').textContent = COMPLAINTS.length;
+  document.getElementById('page-cur').textContent   = _cPage;
+  document.getElementById('page-total').textContent = total;
+  document.getElementById('page-prev').disabled = _cPage<=1;
+  document.getElementById('page-next').disabled = _cPage>=total;
+
+  // Page number buttons (show max 5)
+  const pnEl=document.getElementById('page-nums');
+  pnEl.innerHTML='';
+  const start=Math.max(1,_cPage-2), end=Math.min(total,start+4);
+  for(let i=start;i<=end;i++){
+    const b=document.createElement('button');
+    b.className='btn btn-secondary btn-sm';
+    b.textContent=i;
+    if(i===_cPage){b.style.background='var(--navy)';b.style.color='#fff';}
+    b.onclick=(()=>{const p=i;return()=>{_cPage=p;renderComplaints();}})();
+    pnEl.appendChild(b);
+  }
+
   const t=document.getElementById('complaints-table');
-  if(!data.length){
-    t.innerHTML=`<tbody><tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">No complaints match the selected filters.</td></tr></tbody>`;
+  if(!all.length){
+    t.innerHTML=`<tbody><tr><td colspan="11" style="text-align:center;padding:40px 20px;color:var(--muted)">
+      <div style="font-size:32px;margin-bottom:8px">ðŸ”</div>No complaints match the selected filters.
+      <br><button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="clearFilters()">Clear Filters</button>
+    </td></tr></tbody>`;
     return;
   }
+
   t.innerHTML=`<thead><tr>
-    <th>Ref No.</th><th>Category</th><th>Title</th><th>Complainant</th><th>Priority</th><th>Status</th><th>Submitted</th><th>Assigned</th><th>Action</th>
+    <th style="width:130px">Ref No.</th>
+    <th>Title</th>
+    <th>Category</th>
+    <th>Priority</th>
+    <th>Status</th>
+    <th style="white-space:nowrap">Submitted</th>
+    <th style="white-space:nowrap">Last Updated</th>
+    <th>Assigned Officer</th>
+    <th>Confidentiality</th>
+    <th style="width:90px">Action</th>
   </tr></thead><tbody>${data.map(c=>{
-    const overdue=c.status!=='Resolved'&&c.status!=='Closed'&&c.daysUsed>c.sla;
-    return`<tr style="cursor:pointer;${overdue?'background:#fff8f8;':''}" onclick="openComplaintModal('${c.id}')">
-      <td style="white-space:nowrap"><strong style="color:var(--teal)">${c.id}</strong>${c.confidential?'<span class="badge b-overdue" style="margin-left:4px;font-size:9px">ðŸ”’</span>':''}</td>
-      <td style="white-space:nowrap">${catIcon(c.category)} <span style="font-size:12px">${c.category}</span></td>
-      <td style="max-width:180px"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px" title="${c.title}">${c.title}</div></td>
-      <td style="font-size:12px;white-space:nowrap">${c.complainant}</td>
+    const ov=isOverdue(c);
+    const confLvl=c.confidentialLevel||'Normal';
+    const confLabel={'Normal':'','Confidential':'ðŸ”’ Conf','Highly Confidential':'ðŸ” Highly Conf'}[confLvl]||'';
+    const confStyle={'Normal':'','Confidential':'background:#fef3c7;color:#92400e','Highly Confidential':'background:#fee2e2;color:#991b1b'}[confLvl]||'';
+    return`<tr style="cursor:pointer;${ov?'background:#fff8f8;':''}" onclick="openComplaintModal('${c.id}')">
+      <td style="white-space:nowrap">
+        <div style="font-weight:700;color:var(--teal);font-size:12px">${c.id}</div>
+        ${ov?'<div style="font-size:10px;color:var(--red);font-weight:700;margin-top:2px">âš  OVERDUE</div>':''}
+      </td>
+      <td style="max-width:200px">
+        <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;font-size:13px;font-weight:500" title="${c.title}">${c.title}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:1px">${c.complainant}</div>
+      </td>
+      <td style="white-space:nowrap;font-size:12px">${catIcon(c.category)} ${c.category}</td>
       <td>${priorityBadge(c.priority)}</td>
-      <td>${overdue?'<span class="badge b-overdue">Overdue</span>':statusBadge(c.status)}</td>
+      <td>${ov?'<span class="badge b-overdue">Overdue</span>':statusBadge(c.status)}</td>
       <td style="white-space:nowrap;font-size:12px;color:var(--muted)">${c.date}</td>
-      <td style="font-size:12px;color:var(--muted)">${c.assigned||'<span style="color:#9ca3af">Unassigned</span>'}</td>
+      <td style="white-space:nowrap;font-size:12px;color:var(--muted)">${c.updatedDate||c.date}</td>
+      <td style="font-size:12px">${c.assigned||'<span style="color:#9ca3af">Unassigned</span>'}</td>
+      <td>${confLabel?`<span class="badge" style="${confStyle};font-size:10px">${confLabel}</span>`:'<span style="font-size:11px;color:var(--muted)">Normal</span>'}</td>
       <td onclick="event.stopPropagation()">
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-secondary btn-xs" onclick="openComplaintModal('${c.id}')">ðŸ‘ View</button>
-        </div>
+        <button class="btn btn-teal btn-xs" onclick="openComplaintModal('${c.id}')">View</button>
       </td>
     </tr>`;
   }).join('')}</tbody>`;
 }
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// COMPLAINT DETAIL MODAL
+// COMPLAINT DETAIL MODAL â€” tabbed
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function openComplaintModal(id){
   const c=COMPLAINTS.find(x=>x.id===id);
   if(!c)return;
   currentComplaintId=id;
-  document.getElementById('modal-complaint-title').textContent=`${c.id} â€” ${c.title}`;
-  const overdue=c.status!=='Resolved'&&c.status!=='Closed'&&c.daysUsed>c.sla;
+  const ov=isOverdue(c);
+  const confLvl=c.confidentialLevel||'Normal';
+  const confColors={'Normal':'var(--teal)','Confidential':'var(--amber)','Highly Confidential':'var(--red)'};
+  const confLabels={'Normal':'ðŸŒ Normal','Confidential':'ðŸ”’ Confidential','Highly Confidential':'ðŸ” Highly Confidential'};
+  const docs=DOCUMENTS.filter(d=>d.complaint===c.id);
+  const notes=(c.notes||[]);
+  const pubUpdates=(c.publicUpdates||[]);
+  const history=(c.statusHistory||[]);
+  const allowed=getAllowedTransitions(c.status);
+
+  document.getElementById('modal-complaint-title').innerHTML=`
+    <span style="font-size:13px;color:var(--teal);font-weight:700">${c.id}</span>
+    <span style="font-size:13px;color:var(--muted);font-weight:400;margin:0 6px">â€”</span>
+    <span style="font-size:15px">${c.title}</span>`;
+
   document.getElementById('modal-complaint-body').innerHTML=`
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-      ${overdue?'<span class="badge b-overdue">ðŸš¨ OVERDUE</span>':''}
+    <!-- Badge row -->
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+      ${ov?'<span class="badge b-overdue">ðŸš¨ OVERDUE</span>':''}
       ${statusBadge(c.status)} ${priorityBadge(c.priority)}
       <span class="badge b-navy">${catIcon(c.category)} ${c.category}</span>
-      ${c.confidential?'<span class="badge b-overdue">ðŸ”’ Confidential</span>':''}
+      <span class="badge" style="background:${confColors[confLvl]}22;color:${confColors[confLvl]};border:1px solid ${confColors[confLvl]}44">${confLabels[confLvl]}</span>
     </div>
-    <div class="grid-2" style="margin-bottom:16px">
-      <div style="background:#f8fafc;border-radius:8px;padding:14px">
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Complainant</div>
-        <div style="font-size:13px;line-height:1.8"><strong>${c.complainant}</strong><br>Department: ${c.dept}<br>Location: ${c.location}<br>Submitted: ${c.date}</div>
+
+    <!-- Info grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div style="background:#f8fafc;border-radius:8px;padding:14px;font-size:13px;line-height:1.9">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Complaint Details</div>
+        <div><span style="color:var(--muted)">Complainant:</span> <strong>${c.complainant}</strong></div>
+        <div><span style="color:var(--muted)">Department:</span> ${c.dept}</div>
+        <div><span style="color:var(--muted)">Location:</span> ${c.location}</div>
+        <div><span style="color:var(--muted)">Submitted:</span> ${c.date}</div>
+        <div><span style="color:var(--muted)">Last Updated:</span> ${c.updatedDate||c.date}</div>
       </div>
-      <div style="background:#f8fafc;border-radius:8px;padding:14px">
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Resolution</div>
-        <div style="font-size:13px;line-height:1.8">
-          Assigned: <strong>${c.assigned||'Unassigned'}</strong><br>
-          SLA Target: <strong>${c.sla} day(s)</strong><br>
-          Days Used: <strong style="color:${c.daysUsed>c.sla?'var(--red)':'var(--green)'}">${c.daysUsed} day(s)</strong><br>
-          Resolved: <strong>${c.resolvedDate||'â€”'}</strong>
-        </div>
+      <div style="background:#f8fafc;border-radius:8px;padding:14px;font-size:13px;line-height:1.9">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Processing</div>
+        <div><span style="color:var(--muted)">Assigned To:</span> <strong>${c.assigned||'â€” Unassigned'}</strong></div>
+        <div><span style="color:var(--muted)">SLA Target:</span> ${c.sla} working day(s)</div>
+        <div><span style="color:var(--muted)">Days Used:</span> <strong style="color:${c.daysUsed>c.sla?'var(--red)':'var(--green)'}">${c.daysUsed}</strong></div>
+        <div><span style="color:var(--muted)">Resolved:</span> ${c.resolvedDate||'â€”'}</div>
+        <div><span style="color:var(--muted)">Attachments:</span> ${docs.length} file(s)</div>
       </div>
     </div>
-    <div style="background:#f8fafc;border-radius:8px;padding:14px;margin-bottom:14px">
+
+    <!-- Description -->
+    <div style="background:#f8fafc;border-radius:8px;padding:14px;margin-bottom:16px">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Description</div>
-      <p style="font-size:13px;color:var(--text);line-height:1.6">${c.desc}</p>
+      <p style="font-size:13px;line-height:1.7">${c.desc}</p>
     </div>
-    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">ðŸ“ Processing Timeline</div>
-    <div class="timeline">
-      <div class="tl-item"><div class="tl-dot done"></div><div class="tl-date">${c.date}</div><div class="tl-title">Complaint Submitted</div><div class="tl-desc">Complaint received and assigned reference number ${c.id}</div></div>
-      ${c.assigned?`<div class="tl-item"><div class="tl-dot done"></div><div class="tl-date">${c.date}</div><div class="tl-title">Assigned to Investigator</div><div class="tl-desc">Assigned to: ${c.assigned}</div></div>`:''}
-      ${c.status==='In Progress'||c.status==='Overdue'?`<div class="tl-item"><div class="tl-dot current"></div><div class="tl-title">Under Investigation</div><div class="tl-desc">Investigation currently in progress</div></div>`:''}
-      ${c.status==='Resolved'?`<div class="tl-item"><div class="tl-dot done"></div><div class="tl-date">${c.resolvedDate}</div><div class="tl-title">Complaint Resolved</div><div class="tl-desc">Matter has been resolved and complainant notified.</div></div>`:''}
-      ${c.status==='New'?`<div class="tl-item"><div class="tl-dot pending"></div><div class="tl-title">Awaiting Assignment</div><div class="tl-desc">Pending assignment to an investigator</div></div>`:''}
+
+    <!-- Tabs -->
+    <div class="tabs" id="detail-tabs">
+      <div class="tab active" onclick="switchDetailTab('history',this)">ðŸ“ Status History</div>
+      <div class="tab" onclick="switchDetailTab('notes',this)">ðŸ“ Internal Notes (${notes.length})</div>
+      <div class="tab" onclick="switchDetailTab('updates',this)">ðŸ“¢ Public Updates (${pubUpdates.length})</div>
+      <div class="tab" onclick="switchDetailTab('docs',this)">ðŸ“Ž Documents (${docs.length})</div>
     </div>
-    <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
-      ${c.status==='New'?`<button class="btn btn-teal btn-sm" onclick="alert('Assign investigator â€” requires backend in production.')">ðŸ‘¤ Assign Investigator</button>`:''}
-      ${c.status!=='Resolved'&&c.status!=='Closed'?`<button class="btn btn-secondary btn-sm" onclick="alert('Update status â€” requires backend in production.')">ðŸ”„ Update Status</button>`:''}
-      <button class="btn btn-secondary btn-sm" onclick="alert('Add comment â€” requires backend in production.')">ðŸ’¬ Add Comment</button>
+
+    <!-- Tab: History -->
+    <div class="tab-pane active" id="dtab-history" style="padding:14px 0">
+      <div class="timeline">
+        ${history.map((h,i)=>{
+          const isLast=i===history.length-1;
+          const isCurrent=isLast&&c.status!=='Resolved'&&c.status!=='Closed';
+          return`<div class="tl-item">
+            <div class="tl-dot ${c.status==='Resolved'||c.status==='Closed'?'done':(isCurrent?'current':'done')}"></div>
+            <div class="tl-date">${h.date} &nbsp;Â·&nbsp; <span style="color:var(--teal)">${h.by}</span></div>
+            <div class="tl-title">Status changed to: <strong>${h.status}</strong></div>
+            <div class="tl-desc">${h.note}</div>
+          </div>`;
+        }).join('')}
+        ${!['Resolved','Closed'].includes(c.status)?`<div class="tl-item"><div class="tl-dot pending"></div><div class="tl-title" style="color:var(--muted)">Pending next action</div></div>`:''}
+      </div>
+    </div>
+
+    <!-- Tab: Internal Notes -->
+    <div class="tab-pane" id="dtab-notes" style="padding:14px 0">
+      <div class="alert alert-amber" style="margin-bottom:12px;padding:8px 12px">
+        <span class="alert-icon" style="font-size:13px">âš ï¸</span>
+        <div style="font-size:12px"><strong>Internal use only.</strong> These notes are not visible to the complainant. In production, access is restricted to authorised staff.</div>
+      </div>
+      ${notes.length?notes.map(n=>`
+        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px;margin-bottom:10px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">ðŸ”’ <strong>${n.by}</strong> &nbsp;Â·&nbsp; ${n.date} &nbsp;Â·&nbsp; <em>Internal</em></div>
+          <div style="font-size:13px">${n.text}</div>
+        </div>`).join('')
+      :`<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">No internal notes recorded.</div>`}
+      <div style="margin-top:12px">
+        <textarea id="new-note-text" placeholder="Add an internal note (staff only â€” visible here, not to complainant)..." style="width:100%;border:1px solid #d0d7de;border-radius:8px;padding:9px 12px;font-size:13px;resize:vertical;min-height:70px"></textarea>
+        <button class="btn btn-secondary btn-sm" style="margin-top:6px" onclick="addInternalNote('${c.id}')">+ Add Note</button>
+      </div>
+    </div>
+
+    <!-- Tab: Public Updates -->
+    <div class="tab-pane" id="dtab-updates" style="padding:14px 0">
+      <div class="alert alert-blue" style="margin-bottom:12px;padding:8px 12px">
+        <span class="alert-icon" style="font-size:13px">â„¹ï¸</span>
+        <div style="font-size:12px">These updates are visible to the complainant through the Track Complaint page.</div>
+      </div>
+      ${pubUpdates.length?pubUpdates.slice().reverse().map(u=>`
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;margin-bottom:10px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">ðŸ“¢ <strong>${u.date}</strong> &nbsp;Â·&nbsp; Public Update</div>
+          <div style="font-size:13px">${u.text}</div>
+        </div>`).join('')
+      :`<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">No public updates yet.</div>`}
+      <div style="margin-top:12px">
+        <textarea id="new-update-text" placeholder="Add a public update (visible to complainant via Track Complaint)..." style="width:100%;border:1px solid #d0d7de;border-radius:8px;padding:9px 12px;font-size:13px;resize:vertical;min-height:70px"></textarea>
+        <button class="btn btn-teal btn-sm" style="margin-top:6px" onclick="addPublicUpdate('${c.id}')">ðŸ“¢ Publish Update</button>
+      </div>
+    </div>
+
+    <!-- Tab: Documents -->
+    <div class="tab-pane" id="dtab-docs" style="padding:14px 0">
+      ${docs.length?`<table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead><tr>
+          <th style="background:#f8fafc;padding:7px 10px;border-bottom:1px solid var(--border);text-align:left">File</th>
+          <th style="background:#f8fafc;padding:7px 10px;border-bottom:1px solid var(--border);text-align:left">Type</th>
+          <th style="background:#f8fafc;padding:7px 10px;border-bottom:1px solid var(--border);text-align:left">Size</th>
+          <th style="background:#f8fafc;padding:7px 10px;border-bottom:1px solid var(--border);text-align:left">Uploaded</th>
+          <th style="background:#f8fafc;padding:7px 10px;border-bottom:1px solid var(--border);text-align:left">By</th>
+        </tr></thead>
+        <tbody>${docs.map(d=>`<tr>
+          <td style="padding:8px 10px;border-bottom:1px solid #f0f4f8">ðŸ“Ž ${d.name}</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #f0f4f8"><span class="badge b-navy">${d.type}</span></td>
+          <td style="padding:8px 10px;border-bottom:1px solid #f0f4f8;color:var(--muted)">${d.size}</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #f0f4f8;color:var(--muted)">${d.uploaded}</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #f0f4f8">${d.uploader}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+      <div style="font-size:11px;color:var(--muted);margin-top:10px">âš  File download requires secure backend storage (production only).</div>`
+      :`<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">ðŸ“Ž No documents attached to this complaint.</div>`}
+    </div>
+
+    <!-- Action footer -->
+    <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      ${allowed.length?`
+        <span style="font-size:12px;color:var(--muted);font-weight:600">Move to:</span>
+        ${allowed.map(s=>`<button class="btn btn-sm" style="background:var(--teal-light);color:var(--teal);border:1px solid var(--teal)" onclick="changeStatus('${c.id}','${s}')">â†’ ${s}</button>`).join('')}
+        <div style="flex:1"></div>`:''}
       <button class="btn btn-secondary btn-sm" onclick="closeModal()">Close</button>
     </div>`;
+
   document.getElementById('complaint-modal').classList.add('open');
 }
+
+function switchDetailTab(name,el){
+  document.querySelectorAll('#detail-tabs .tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('#modal-complaint-body .tab-pane').forEach(p=>p.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const pane=document.getElementById('dtab-'+name);
+  if(pane) pane.classList.add('active');
+}
+
+function addInternalNote(id){
+  const c=COMPLAINTS.find(x=>x.id===id); if(!c)return;
+  const txt=document.getElementById('new-note-text')?.value.trim();
+  if(!txt){alert('Please enter a note.');return;}
+  if(!c.notes)c.notes=[];
+  c.notes.push({by:'Admin (Demo)',date:new Date().toISOString().slice(0,10),internal:true,text:txt});
+  c.updatedDate=new Date().toISOString().slice(0,10);
+  openComplaintModal(id);
+  setTimeout(()=>switchDetailTab('notes',document.querySelector('#detail-tabs .tab:nth-child(2)')),50);
+}
+
+function addPublicUpdate(id){
+  const c=COMPLAINTS.find(x=>x.id===id); if(!c)return;
+  const txt=document.getElementById('new-update-text')?.value.trim();
+  if(!txt){alert('Please enter an update.');return;}
+  if(!c.publicUpdates)c.publicUpdates=[];
+  c.publicUpdates.push({date:new Date().toISOString().slice(0,10),text:txt});
+  c.updatedDate=new Date().toISOString().slice(0,10);
+  openComplaintModal(id);
+  setTimeout(()=>switchDetailTab('updates',document.querySelector('#detail-tabs .tab:nth-child(3)')),50);
+}
+
+function changeStatus(id,newStatus){
+  const c=COMPLAINTS.find(x=>x.id===id); if(!c)return;
+  const allowed=getAllowedTransitions(c.status);
+  if(!allowed.includes(newStatus)){alert(`Cannot transition from "${c.status}" to "${newStatus}".`);return;}
+  const today=new Date().toISOString().slice(0,10);
+  c.status=newStatus;
+  c.updatedDate=today;
+  if(!c.statusHistory)c.statusHistory=[];
+  c.statusHistory.push({status:newStatus,date:today,by:'Admin (Demo)',note:`Status changed to ${newStatus} via admin action.`});
+  if(newStatus==='Resolved'||newStatus==='Closed'){c.resolvedDate=today;}
+  // Update public update
+  if(!c.publicUpdates)c.publicUpdates=[];
+  const publicMsg={
+    'Under Review':'Your complaint is now under review by our team.',
+    'In Progress':'An officer is actively investigating your complaint.',
+    'Awaiting Response':'We are awaiting your response or confirmation to proceed.',
+    'Resolved':'Your complaint has been resolved. Thank you for your report.',
+    'Closed':'This complaint has been closed.',
+    'Reopened':'Your complaint has been reopened for further review.',
+  }[newStatus];
+  if(publicMsg) c.publicUpdates.push({date:today,text:publicMsg});
+  // Refresh
+  renderRecentTable();
+  renderComplaints();
+  openComplaintModal(id); // re-render modal
+}
+
 function closeModal(){
   document.getElementById('complaint-modal').classList.remove('open');
 }
@@ -1362,39 +1749,96 @@ document.getElementById('complaint-modal').addEventListener('click',e=>{if(e.tar
 document.getElementById('success-modal').addEventListener('click',e=>{if(e.target.id==='success-modal')closeSuccessModal();});
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// TRACK COMPLAINT
+// TRACK COMPLAINT â€” public view only
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function trackSearch(){
-  const q=(document.getElementById('track-input').value||'').trim().toLowerCase();
-  document.getElementById('track-result').style.display='none';
-  document.getElementById('track-not-found').style.display='none';
+  const q=(document.getElementById('track-input').value||'').trim();
+  const el_result=document.getElementById('track-result');
+  const el_nf=document.getElementById('track-not-found');
+  el_result.style.display='none';
+  el_nf.style.display='none';
   if(!q)return;
-  const c=COMPLAINTS.find(x=>x.id.toLowerCase()===q||x.complainant.toLowerCase().includes(q));
-  if(!c){document.getElementById('track-not-found').style.display='block';return;}
-  const overdue=c.status!=='Resolved'&&c.status!=='Closed'&&c.daysUsed>c.sla;
-  document.getElementById('track-title').textContent=`${c.id} â€” ${c.title}`;
-  document.getElementById('track-status-badge').innerHTML=`${overdue?'<span class="badge b-overdue">ðŸš¨ Overdue</span>':statusBadge(c.status)} ${priorityBadge(c.priority)}`;
+
+  const c=COMPLAINTS.find(x=>x.id.toLowerCase()===q.toLowerCase());
+  if(!c){
+    document.getElementById('track-searched-ref').textContent=q;
+    el_nf.style.display='block';
+    return;
+  }
+
+  const ov=isOverdue(c);
+  const statusColors={New:'#2563eb','Under Review':'#7c3aed','In Progress':'#d97706','Awaiting Response':'#ea580c',Resolved:'#059669',Closed:'#6b7280',Reopened:'#0F9D8A'};
+  const sc=statusColors[c.status]||'#6b7280';
+
+  // Status banner
+  document.getElementById('track-status-banner').style.cssText=`border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:${sc}14;border:1px solid ${sc}44`;
+  document.getElementById('track-status-banner').innerHTML=`
+    <div style="font-size:36px;line-height:1">${c.status==='Resolved'?'âœ…':c.status==='Closed'?'ðŸ“':ov?'ðŸš¨':'ðŸ”„'}</div>
+    <div style="flex:1">
+      <div style="font-size:18px;font-weight:800;color:${sc}">${ov?'Overdue â€” ':''} ${c.status}</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:2px">${c.id} â€” ${c.title}</div>
+    </div>
+    ${priorityBadge(c.priority)}`;
+
+  // Complaint info â€” PUBLIC fields only, no personal data, no internal notes
   document.getElementById('track-info').innerHTML=`
     <div style="font-size:13px;line-height:2">
-      <div><span style="color:var(--muted)">Reference:</span> <strong style="color:var(--teal)">${c.id}</strong></div>
-      <div><span style="color:var(--muted)">Category:</span> ${catIcon(c.category)} ${c.category}</div>
-      <div><span style="color:var(--muted)">Submitted:</span> ${c.date}</div>
-      <div><span style="color:var(--muted)">Location:</span> ${c.location}</div>
+      <div style="display:grid;grid-template-columns:140px 1fr;gap:2px 0">
+        <span style="color:var(--muted)">Reference No.:</span><strong style="color:var(--teal)">${c.id}</strong>
+        <span style="color:var(--muted)">Category:</span><span>${catIcon(c.category)} ${c.category}</span>
+        <span style="color:var(--muted)">Priority:</span><span>${priorityBadge(c.priority)}</span>
+        <span style="color:var(--muted)">Date Submitted:</span><span>${c.date}</span>
+        <span style="color:var(--muted)">Last Updated:</span><span>${c.updatedDate||c.date}</span>
+        <span style="color:var(--muted)">SLA Target:</span><span>${c.sla} working day(s)</span>
+        ${c.resolvedDate?`<span style="color:var(--muted)">Date Resolved:</span><span>${c.resolvedDate}</span>`:''}
+      </div>
     </div>`;
-  document.getElementById('track-assign').innerHTML=`
-    <div style="font-size:13px;line-height:2">
-      <div><span style="color:var(--muted)">Assigned to:</span> <strong>${c.assigned||'Pending Assignment'}</strong></div>
-      <div><span style="color:var(--muted)">SLA Target:</span> ${c.sla} day(s)</div>
-      <div><span style="color:var(--muted)">Days Elapsed:</span> <span style="color:${c.daysUsed>c.sla?'var(--red)':'var(--green)';}">${c.daysUsed}</span></div>
-      <div><span style="color:var(--muted)">Resolved:</span> ${c.resolvedDate||'â€”'}</div>
+
+  // Public updates only
+  const pubUpdates=(c.publicUpdates||[]);
+  document.getElementById('track-updates').innerHTML=pubUpdates.length
+    ? pubUpdates.slice().reverse().map(u=>`
+      <div style="padding:10px 0;border-bottom:1px solid #f0f4f8">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:3px">ðŸ“¢ ${u.date}</div>
+        <div style="font-size:13px">${u.text}</div>
+      </div>`).join('')
+    : `<div style="font-size:13px;color:var(--muted);padding:8px 0">No public updates yet. Check back later.</div>`;
+
+  // Status timeline â€” from statusHistory, public info only (no internal notes)
+  const history=(c.statusHistory||[]);
+  document.getElementById('track-timeline').innerHTML=history.map((h,i)=>{
+    const isLast=i===history.length-1;
+    const isCurrent=isLast&&!['Resolved','Closed'].includes(c.status);
+    return`<div class="tl-item">
+      <div class="tl-dot ${isCurrent?'current':'done'}"></div>
+      <div class="tl-date">${h.date}</div>
+      <div class="tl-title"><strong>${h.status}</strong></div>
+      <div class="tl-desc" style="color:var(--muted)">Your complaint status was updated</div>
     </div>`;
-  document.getElementById('track-timeline').innerHTML=`
-    <div class="tl-item"><div class="tl-dot done"></div><div class="tl-date">${c.date}</div><div class="tl-title">Complaint Submitted</div><div class="tl-desc">Your complaint has been received. Reference: ${c.id}</div></div>
-    ${c.assigned?`<div class="tl-item"><div class="tl-dot done"></div><div class="tl-title">Assigned</div><div class="tl-desc">Assigned to ${c.assigned} for investigation</div></div>`:'<div class="tl-item"><div class="tl-dot pending"></div><div class="tl-title">Awaiting Assignment</div><div class="tl-desc">Your complaint will be assigned to an investigator shortly</div></div>'}
-    ${c.status==='In Progress'||c.status==='Overdue'?`<div class="tl-item"><div class="tl-dot current"></div><div class="tl-title">Under Investigation</div><div class="tl-desc">Your complaint is being actively investigated</div></div>`:''}
-    ${c.status==='Resolved'?`<div class="tl-item"><div class="tl-dot done"></div><div class="tl-date">${c.resolvedDate}</div><div class="tl-title">âœ… Resolved</div><div class="tl-desc">Your complaint has been resolved. Thank you for your feedback.</div></div>`:''}
-    ${c.status==='New'?`<div class="tl-item"><div class="tl-dot pending"></div><div class="tl-title">Pending Review</div><div class="tl-desc">Our team will review and respond within ${c.sla} working day(s)</div></div>`:''}`;
-  document.getElementById('track-result').style.display='block';
+  }).join('')+(!['Resolved','Closed'].includes(c.status)?
+    `<div class="tl-item"><div class="tl-dot pending"></div><div class="tl-title" style="color:var(--muted)">Pending next action</div></div>`:
+    `<div class="tl-item"><div class="tl-dot done"></div><div class="tl-title" style="color:var(--green)">Case completed</div></div>`);
+
+  // Next action hint
+  const nextActions={
+    'New':'Your complaint is in the queue and will be assigned to an officer shortly.',
+    'Under Review':'An officer is reviewing the details of your complaint.',
+    'In Progress':'An investigation is underway. You will be notified of progress.',
+    'Awaiting Response':'Please check the Public Updates section above for any questions from our team.',
+    'Resolved':'Your complaint has been resolved. If you are not satisfied, you may reopen it.',
+    'Closed':'This complaint is closed. Please submit a new complaint if the issue recurs.',
+    'Reopened':'Your complaint has been reopened. An officer will review it again.',
+  };
+  const na=document.getElementById('track-next-action');
+  const nt=document.getElementById('track-next-text');
+  if(nextActions[c.status]){
+    nt.innerHTML=`<strong>What happens next:</strong> ${nextActions[c.status]}`;
+    na.style.display='flex';
+  } else {
+    na.style.display='none';
+  }
+
+  el_result.style.display='block';
 }
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
