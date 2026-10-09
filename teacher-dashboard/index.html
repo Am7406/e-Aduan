@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>My Academic Teaching Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14px;background:#f0f4f8;color:#1f2328;line-height:1.6}
+a{color:#2563a8;text-decoration:none}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#f0f4f8}
+::-webkit-scrollbar-thumb{background:#b0bec5;border-radius:3px}
+
+/* â”€â”€ LAYOUT â”€â”€ */
+.topbar{background:linear-gradient(135deg,#1a4a7a 0%,#1d6fa5 60%,#0f9492 100%);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.topbar-title{font-size:20px;font-weight:700;letter-spacing:.3px}
+.topbar-title span{font-size:12px;font-weight:400;opacity:.75;display:block;margin-top:2px}
+.topbar-right{display:flex;gap:12px;align-items:center}
+.topbar-badge{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 12px;font-size:12px}
+.sample-label{background:#e8f4fd;border:1px solid #90caf9;color:#1565c0;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-block}
+
+.container{max-width:1400px;margin:0 auto;padding:20px 24px}
+
+/* â”€â”€ FILTERS BAR â”€â”€ */
+.filters-bar{background:#fff;border:1px solid #dde3ea;border-radius:10px;padding:12px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:20px}
+.filters-bar label{font-size:12px;font-weight:600;color:#57606a;margin-right:4px}
+.filters-bar select{border:1px solid #d0d7de;border-radius:6px;padding:5px 10px;font-size:13px;color:#1f2328;background:#fafafa;cursor:pointer}
+.filters-bar select:focus{outline:2px solid #2563a8;border-color:#2563a8}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:background .15s,transform .1s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:#2563a8;color:#fff}
+.btn-primary:hover{background:#1a4a7a}
+.btn-secondary{background:#f0f4f8;color:#1f2328;border:1px solid #d0d7de}
+.btn-secondary:hover{background:#e2e8f0}
+.btn-danger{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5}
+.btn-danger:hover{background:#fecaca}
+.btn-sm{padding:4px 10px;font-size:12px}
+
+/* â”€â”€ SUMMARY CARDS â”€â”€ */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
+.scard{background:#fff;border:1px solid #dde3ea;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden}
+.scard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.scard.c1::before{background:#2563a8}
+.scard.c2::before{background:#0891b2}
+.scard.c3::before{background:#0f9492}
+.scard.c4::before{background:#d97706}
+.scard.c5::before{background:#7c3aed}
+.scard.c6::before{background:#059669}
+.scard-label{font-size:11px;font-weight:600;color:#57606a;text-transform:uppercase;letter-spacing:.5px}
+.scard-value{font-size:30px;font-weight:800;color:#1f2328;line-height:1}
+.scard-sub{font-size:11px;color:#57606a}
+.scard-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:28px;opacity:.12}
+
+/* â”€â”€ SECTION LAYOUT â”€â”€ */
+.section{background:#fff;border:1px solid #dde3ea;border-radius:12px;margin-bottom:20px;overflow:hidden}
+.section-header{padding:14px 18px;border-bottom:1px solid #f0f4f8;display:flex;align-items:center;justify-content:space-between;background:#fcfdff}
+.section-title{font-size:15px;font-weight:700;color:#1a4a7a;display:flex;align-items:center;gap:8px}
+.section-title .icon{font-size:16px}
+.section-body{padding:16px 18px}
+
+/* â”€â”€ TABS â”€â”€ */
+.tabs{display:flex;gap:0;border-bottom:2px solid #e5e7eb;margin-bottom:0;overflow-x:auto}
+.tab{padding:10px 18px;font-size:13px;font-weight:600;color:#57606a;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:color .15s,border-color .15s}
+.tab:hover{color:#2563a8}
+.tab.active{color:#2563a8;border-bottom-color:#2563a8}
+.tab-content{display:none;padding:16px 18px}
+.tab-content.active{display:block}
+
+/* â”€â”€ TABLE â”€â”€ */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f8fafc;color:#57606a;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding:9px 12px;text-align:left;border-bottom:2px solid #e5e7eb;white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid #f0f4f8;vertical-align:middle}
+tr:hover td{background:#fafcff}
+tr:last-child td{border-bottom:none}
+
+/* â”€â”€ BADGES â”€â”€ */
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.badge-green{background:#d1fae5;color:#065f46}
+.badge-yellow{background:#fef3c7;color:#92400e}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-blue{background:#dbeafe;color:#1e40af}
+.badge-purple{background:#ede9fe;color:#5b21b6}
+.badge-gray{background:#f1f5f9;color:#475569}
+.badge-orange{background:#ffedd5;color:#9a3412}
+.badge-teal{background:#ccfbf1;color:#065f46}
+
+/* â”€â”€ PROGRESS BAR â”€â”€ */
+.progress-wrap{background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;min-width:80px}
+.progress-fill{height:100%;border-radius:99px;transition:width .4s}
+.progress-blue{background:linear-gradient(90deg,#2563a8,#3b82f6)}
+.progress-teal{background:linear-gradient(90deg,#0f9492,#14b8a6)}
+.progress-green{background:#10b981}
+.progress-yellow{background:#f59e0b}
+.progress-red{background:#ef4444}
+.progress-pct{font-size:11px;font-weight:700;color:#57606a;margin-left:6px;white-space:nowrap}
+
+/* â”€â”€ CLO BARS â”€â”€ */
+.clo-item{margin-bottom:14px}
+.clo-header{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:4px;color:#374151}
+.clo-bar-wrap{position:relative;background:#e5e7eb;border-radius:99px;height:18px;overflow:visible}
+.clo-bar-fill{height:100%;border-radius:99px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:11px;font-weight:700;color:#fff;position:relative}
+.clo-target-line{position:absolute;top:-4px;bottom:-4px;width:2px;background:#374151;border-radius:2px;z-index:2}
+.clo-target-label{position:absolute;top:-18px;font-size:10px;font-weight:700;color:#374151;white-space:nowrap;transform:translateX(-50%)}
+
+/* â”€â”€ ALERTS â”€â”€ */
+.alert{border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px;font-size:13px}
+.alert-icon{font-size:16px;margin-top:1px;flex-shrink:0}
+.alert-red{background:#fef2f2;border:1px solid #fecaca;color:#7f1d1d}
+.alert-yellow{background:#fffbeb;border:1px solid #fde68a;color:#78350f}
+.alert-blue{background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a5f}
+.alert-green{background:#f0fdf4;border:1px solid #bbf7d0;color:#14532d}
+.alert strong{font-weight:700}
+
+/* â”€â”€ CHECKLIST â”€â”€ */
+.checklist-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f0f4f8}
+.checklist-item:last-child{border-bottom:none}
+.checklist-item input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:#2563a8}
+.checklist-label{flex:1;font-size:13px}
+.checklist-label.done{text-decoration:line-through;color:#9ca3af}
+
+/* â”€â”€ MODAL â”€â”€ */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:14px;width:min(760px,95vw);max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal-header{padding:16px 20px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1}
+.modal-header h3{font-size:16px;font-weight:700;color:#1a4a7a}
+.modal-close{font-size:22px;cursor:pointer;color:#9ca3af;line-height:1;padding:2px 6px;border-radius:4px}
+.modal-close:hover{background:#f0f4f8;color:#374151}
+.modal-body{padding:20px}
+.modal-section{margin-bottom:20px}
+.modal-section h4{font-size:13px;font-weight:700;color:#57606a;text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f0f4f8}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.detail-card{background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:12px;text-align:center}
+.detail-card .val{font-size:24px;font-weight:800;color:#1a4a7a}
+.detail-card .lbl{font-size:11px;color:#57606a;margin-top:2px}
+
+/* â”€â”€ FORM â”€â”€ */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:12px;font-weight:600;color:#57606a}
+.form-group input,.form-group select,.form-group textarea{border:1px solid #d0d7de;border-radius:7px;padding:7px 10px;font-size:13px;color:#1f2328;background:#fff}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:2px solid #2563a8;border-color:#2563a8}
+
+/* â”€â”€ STUDENT GRID â”€â”€ */
+.student-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f4f8}
+.student-row:last-child{border-bottom:none}
+
+/* â”€â”€ RESPONSIVE â”€â”€ */
+@media(max-width:640px){
+  .summary-grid{grid-template-columns:repeat(2,1fr)}
+  .topbar{flex-direction:column;gap:8px;text-align:center}
+  .tabs{font-size:12px}
+  td,th{padding:7px 8px;font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• TOP BAR â•â• -->
+<div class="topbar">
+  <div>
+    <div class="topbar-title">ðŸ“š My Academic Teaching Dashboard</div>
+    <span style="font-size:12px;opacity:.75">Polytechnic Malaysia â€” Lecturer Portal &nbsp;â€¢&nbsp; Semester 1 2026/2027 &nbsp;<span style="background:rgba(255,255,255,.2);border-radius:10px;padding:1px 8px;font-size:11px">âš  SAMPLE DATA</span></span>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-badge" id="clockBadge">â€”</div>
+    <div class="topbar-badge">Sem 1 Â· 2026/2027</div>
+    <button class="btn btn-secondary btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.3)" onclick="openAddSubjectModal()">+ Add Subject</button>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• GLOBAL FILTERS â•â• -->
+<div class="filters-bar">
+  <span style="font-size:12px;font-weight:700;color:#1a4a7a">ðŸ” Filters:</span>
+  <label>Semester <select id="fSem" onchange="applyFilters()"><option>All</option><option selected>Sem 1 2026/2027</option><option>Sem 2 2025/2026</option></select></label>
+  <label>Subject <select id="fSubj" onchange="applyFilters()"><option value="">All Subjects</option></select></label>
+  <label>Class <select id="fClass" onchange="applyFilters()"><option value="">All Classes</option></select></label>
+  <label>Status <select id="fStatus" onchange="applyFilters()"><option value="">All Status</option><option>ON TRACK</option><option>NEEDS ATTENTION</option><option>COMPLETED</option></select></label>
+  <button class="btn btn-secondary btn-sm" onclick="resetFilters()">âœ• Reset</button>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• SUMMARY CARDS â•â• -->
+<div class="summary-grid" id="summaryCards">
+  <div class="scard c1"><span class="scard-icon">ðŸ“–</span><div class="scard-label">Total Subjects</div><div class="scard-value" id="sc-subjects">4</div><div class="scard-sub">This semester</div></div>
+  <div class="scard c2"><span class="scard-icon">ðŸ«</span><div class="scard-label">Total Classes</div><div class="scard-value" id="sc-classes">6</div><div class="scard-sub">Groups / sections</div></div>
+  <div class="scard c3"><span class="scard-icon">ðŸ‘¥</span><div class="scard-label">Total Students</div><div class="scard-value" id="sc-students">182</div><div class="scard-sub">Enrolled</div></div>
+  <div class="scard c4"><span class="scard-icon">â³</span><div class="scard-label">Pending Tasks</div><div class="scard-value" id="sc-tasks">7</div><div class="scard-sub">Require attention</div></div>
+  <div class="scard c5"><span class="scard-icon">ðŸ“‹</span><div class="scard-label">Assessment Progress</div><div class="scard-value" id="sc-assessment">62%</div><div class="scard-sub">Across all subjects</div></div>
+  <div class="scard c6"><span class="scard-icon">ðŸŽ¯</span><div class="scard-label">CLO Achievement</div><div class="scard-value" id="sc-clo">71%</div><div class="scard-sub">Average attainment</div></div>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• ALERTS â•â• -->
+<div class="section" id="alertsSection">
+  <div class="section-header">
+    <div class="section-title"><span class="icon">ðŸš¨</span> Needs Attention <span class="sample-label">SAMPLE DATA</span></div>
+    <button class="btn btn-secondary btn-sm" onclick="toggleSection('alertsBody')">Toggle</button>
+  </div>
+  <div class="section-body" id="alertsBody">
+    <div id="alertsList"></div>
+  </div>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• MAIN TABS â•â• -->
+<div class="section">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('subjects')">ðŸ“‹ Subjects</div>
+    <div class="tab" onclick="switchTab('teaching')">ðŸ“ˆ Teaching Progress</div>
+    <div class="tab" onclick="switchTab('assessments')">ðŸ“ Assessments</div>
+    <div class="tab" onclick="switchTab('clo')">ðŸŽ¯ CLO Monitoring</div>
+    <div class="tab" onclick="switchTab('students')">ðŸ‘¥ Student Performance</div>
+    <div class="tab" onclick="switchTab('tasks')">âœ… Task Checklist</div>
+  </div>
+
+  <!-- â”€â”€ TAB 1: SUBJECTS â”€â”€ -->
+  <div class="tab-content active" id="tab-subjects">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:13px;color:#57606a">Click a subject row to view full details. <span class="sample-label">SAMPLE DATA</span></div>
+      <button class="btn btn-primary btn-sm" onclick="openAddSubjectModal()">+ Add Subject</button>
+    </div>
+    <div class="tbl-wrap">
+      <table id="subjectTable">
+        <thead><tr>
+          <th>Code</th><th>Subject Name</th><th>Sem</th><th>Class</th><th>Students</th>
+          <th>Current Topic</th><th>Teaching %</th><th>Assessment %</th>
+          <th>CLO Status</th><th>Next Task</th><th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="subjectTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- â”€â”€ TAB 2: TEACHING PROGRESS â”€â”€ -->
+  <div class="tab-content" id="tab-teaching">
+    <div style="margin-bottom:12px;font-size:13px;color:#57606a">Topic-by-topic teaching progress for each subject. <span class="sample-label">SAMPLE DATA</span></div>
+    <div id="teachingCards"></div>
+  </div>
+
+  <!-- â”€â”€ TAB 3: ASSESSMENTS â”€â”€ -->
+  <div class="tab-content" id="tab-assessments">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:13px;color:#57606a">Track all assessments across subjects. <span class="sample-label">SAMPLE DATA</span></div>
+      <button class="btn btn-primary btn-sm" onclick="openAddAssessmentModal()">+ Add Assessment</button>
+    </div>
+    <div class="tbl-wrap">
+      <table id="assessmentTable">
+        <thead><tr>
+          <th>Subject</th><th>Assessment</th><th>Type</th><th>Due Date</th>
+          <th>Submission</th><th>Marking</th><th>Feedback</th><th>Marks Entered</th><th>% Done</th><th>Status</th>
+        </tr></thead>
+        <tbody id="assessmentTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- â”€â”€ TAB 4: CLO â”€â”€ -->
+  <div class="tab-content" id="tab-clo">
+    <div style="margin-bottom:12px;font-size:13px;color:#57606a">Course Learning Outcome (CLO) attainment per subject. <span class="sample-label">SAMPLE DATA</span></div>
+    <div id="cloCards"></div>
+  </div>
+
+  <!-- â”€â”€ TAB 5: STUDENTS â”€â”€ -->
+  <div class="tab-content" id="tab-students">
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;align-items:center">
+      <label style="font-size:12px;font-weight:600;color:#57606a">Filter by Subject:
+        <select id="stuSubjFilter" onchange="renderStudents()" style="margin-left:6px;border:1px solid #d0d7de;border-radius:6px;padding:5px 10px;font-size:13px"></select>
+      </label>
+      <span class="sample-label">SAMPLE DATA</span>
+    </div>
+    <div id="studentCards"></div>
+  </div>
+
+  <!-- â”€â”€ TAB 6: TASKS â”€â”€ -->
+  <div class="tab-content" id="tab-tasks">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:13px;color:#57606a">Lecturer task checklist. <span class="sample-label">SAMPLE DATA</span></div>
+      <button class="btn btn-primary btn-sm" onclick="openAddTaskModal()">+ Add Task</button>
+    </div>
+    <div class="tbl-wrap">
+      <table id="taskTable">
+        <thead><tr>
+          <th></th><th>Task</th><th>Subject</th><th>Due Date</th><th>Priority</th><th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="taskTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div><!-- /section tabs -->
+
+</div><!-- /container -->
+
+<!-- â•â•â•â•â•â•â• SUBJECT DETAIL MODAL â•â• -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="detailModalTitle">Subject Detail</h3>
+      <span class="modal-close" onclick="closeModal('detailModal')">Ã—</span>
+    </div>
+    <div class="modal-body" id="detailModalBody"></div>
+  </div>
+</div>
+
+<!-- â•â•â•â•â•â•â• ADD/EDIT SUBJECT MODAL â•â• -->
+<div class="modal-overlay" id="subjectModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="subjectModalTitle">Add Subject</h3>
+      <span class="modal-close" onclick="closeModal('subjectModal')">Ã—</span>
+    </div>
+    <div class="modal-body">
+      <form id="subjectForm" onsubmit="saveSubject(event)">
+        <div class="form-grid">
+          <div class="form-group"><label>Subject Code *</label><input id="sf-code" required placeholder="e.g. DPB40133"/></div>
+          <div class="form-group"><label>Subject Name *</label><input id="sf-name" required placeholder="e.g. Business Process Management"/></div>
+          <div class="form-group"><label>Semester</label><input id="sf-sem" value="Sem 1 2026/2027"/></div>
+          <div class="form-group"><label>Class / Group</label><input id="sf-class" placeholder="e.g. DPB3A"/></div>
+          <div class="form-group"><label>No. of Students</label><input id="sf-students" type="number" min="0" value="30"/></div>
+          <div class="form-group"><label>Current Topic</label><input id="sf-topic" placeholder="e.g. Topic 3: Process Mapping"/></div>
+          <div class="form-group"><label>Teaching Progress %</label><input id="sf-teach" type="number" min="0" max="100" value="50"/></div>
+          <div class="form-group"><label>Assessment Progress %</label><input id="sf-assess" type="number" min="0" max="100" value="40"/></div>
+          <div class="form-group"><label>CLO Status</label>
+            <select id="sf-clo"><option>On Track</option><option>At Risk</option><option>Achieved</option></select></div>
+          <div class="form-group"><label>Next Task</label><input id="sf-next" placeholder="e.g. Prepare Quiz 2"/></div>
+          <div class="form-group"><label>Status</label>
+            <select id="sf-status"><option>ON TRACK</option><option>NEEDS ATTENTION</option><option>COMPLETED</option></select></div>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('subjectModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Subject</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- â•â•â•â•â•â•â• ADD ASSESSMENT MODAL â•â• -->
+<div class="modal-overlay" id="assessmentModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Add Assessment</h3>
+      <span class="modal-close" onclick="closeModal('assessmentModal')">Ã—</span>
+    </div>
+    <div class="modal-body">
+      <form id="assessmentForm" onsubmit="saveAssessment(event)">
+        <div class="form-grid">
+          <div class="form-group"><label>Subject *</label><select id="af-subj" required></select></div>
+          <div class="form-group"><label>Assessment Name *</label><input id="af-name" required placeholder="e.g. Quiz 1"/></div>
+          <div class="form-group"><label>Type</label>
+            <select id="af-type"><option>Quiz</option><option>Assignment</option><option>Practical Exercise</option><option>Mini Project</option><option>Presentation</option><option>Test</option><option>Final Examination</option></select></div>
+          <div class="form-group"><label>Due Date</label><input id="af-due" type="date"/></div>
+          <div class="form-group"><label>Submission Status</label>
+            <select id="af-sub"><option>NOT STARTED</option><option>IN PROGRESS</option><option>SUBMITTED</option><option>OVERDUE</option></select></div>
+          <div class="form-group"><label>Marking Status</label>
+            <select id="af-mark"><option>NOT STARTED</option><option>MARKING</option><option>COMPLETED</option></select></div>
+          <div class="form-group"><label>Feedback Status</label>
+            <select id="af-feed"><option>NOT STARTED</option><option>IN PROGRESS</option><option>COMPLETED</option></select></div>
+          <div class="form-group"><label>Marks Entered %</label><input id="af-pct" type="number" min="0" max="100" value="0"/></div>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('assessmentModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Assessment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- â•â•â•â•â•â•â• ADD TASK MODAL â•â• -->
+<div class="modal-overlay" id="taskModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Add Task</h3>
+      <span class="modal-close" onclick="closeModal('taskModal')">Ã—</span>
+    </div>
+    <div class="modal-body">
+      <form id="taskForm" onsubmit="saveTask(event)">
+        <div class="form-grid">
+          <div class="form-group" style="grid-column:1/-1"><label>Task Name *</label><input id="tf-name" required placeholder="e.g. Prepare Quiz 2 materials"/></div>
+          <div class="form-group"><label>Subject</label><select id="tf-subj"></select></div>
+          <div class="form-group"><label>Due Date</label><input id="tf-due" type="date"/></div>
+          <div class="form-group"><label>Priority</label><select id="tf-pri"><option>HIGH</option><option selected>MEDIUM</option><option>LOW</option></select></div>
+          <div class="form-group"><label>Status</label><select id="tf-status"><option>PENDING</option><option>IN PROGRESS</option><option>COMPLETED</option></select></div>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('taskModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// DATA MODEL  (edit this section to update the dashboard)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+let subjects = [
+  {id:1,code:'DPB40133',name:'Business Process Management',sem:'Sem 1 2026/2027',cls:'DPB3A',students:32,topic:'Topic 4: Process Re-engineering',teachPct:65,assessPct:70,cloStatus:'On Track',nextTask:'Prepare Test 1',status:'ON TRACK'},
+  {id:2,code:'DPB40133',name:'Business Process Management',sem:'Sem 1 2026/2027',cls:'DPB3B',students:30,topic:'Topic 4: Process Re-engineering',teachPct:65,assessPct:68,cloStatus:'On Track',nextTask:'Mark Assignment 1',status:'ON TRACK'},
+  {id:3,code:'DPB20213',name:'Business Finance',sem:'Sem 1 2026/2027',cls:'DPB2A',students:38,topic:'Topic 3: Financial Statements',teachPct:45,assessPct:40,cloStatus:'At Risk',nextTask:'Conduct Quiz 2',status:'NEEDS ATTENTION'},
+  {id:4,code:'DPB30323',name:'Introduction to Logistic Management',sem:'Sem 1 2026/2027',cls:'DPB3C',students:35,topic:'Topic 5: Warehouse Management',teachPct:72,assessPct:80,cloStatus:'Achieved',nextTask:'Prepare Mini Project',status:'ON TRACK'},
+  {id:5,code:'DPB20413',name:'Fundamentals of Supply Chain Management',sem:'Sem 1 2026/2027',cls:'DPB2B',students:47,topic:'Topic 2: Supply Chain Strategy',teachPct:30,assessPct:20,cloStatus:'At Risk',nextTask:'Upload lecture notes',status:'NEEDS ATTENTION'},
+];
+
+let assessments = [
+  {id:1,subjId:1,name:'Quiz 1',type:'Quiz',due:'2025-03-10',submission:'SUBMITTED',marking:'COMPLETED',feedback:'COMPLETED',marksPct:100,status:'COMPLETED'},
+  {id:2,subjId:1,name:'Assignment 1',type:'Assignment',due:'2025-04-05',submission:'SUBMITTED',marking:'MARKING',feedback:'NOT STARTED',marksPct:60,status:'MARKING'},
+  {id:3,subjId:1,name:'Test 1',type:'Test',due:'2025-05-02',submission:'NOT STARTED',marking:'NOT STARTED',feedback:'NOT STARTED',marksPct:0,status:'NOT STARTED'},
+  {id:4,subjId:2,name:'Quiz 1',type:'Quiz',due:'2025-03-10',submission:'SUBMITTED',marking:'COMPLETED',feedback:'COMPLETED',marksPct:100,status:'COMPLETED'},
+  {id:5,subjId:2,name:'Assignment 1',type:'Assignment',due:'2025-04-05',submission:'IN PROGRESS',marking:'NOT STARTED',feedback:'NOT STARTED',marksPct:0,status:'IN PROGRESS'},
+  {id:6,subjId:3,name:'Quiz 1',type:'Quiz',due:'2025-03-15',submission:'SUBMITTED',marking:'MARKING',feedback:'NOT STARTED',marksPct:40,status:'MARKING'},
+  {id:7,subjId:3,name:'Quiz 2',type:'Quiz',due:'2025-04-20',submission:'NOT STARTED',marking:'NOT STARTED',feedback:'NOT STARTED',marksPct:0,status:'NOT STARTED'},
+  {id:8,subjId:3,name:'Assignment 1',type:'Assignment',due:'2025-03-28',submission:'OVERDUE',marking:'NOT STARTED',feedback:'NOT STARTED',marksPct:0,status:'OVERDUE'},
+  {id:9,subjId:4,name:'Practical 1',type:'Practical Exercise',due:'2025-03-20',submission:'SUBMITTED',marking:'COMPLETED',feedback:'COMPLETED',marksPct:100,status:'COMPLETED'},
+  {id:10,subjId:4,name:'Mini Project',type:'Mini Project',due:'2025-05-15',submission:'IN PROGRESS',marking:'NOT STARTED',feedback:'NOT STARTED',marksPct:0,status:'IN PROGRESS'},
+  {id:11,subjId:5,name:'Quiz 1',type:'Quiz',due:'2025-03-30',submission:'NOT STARTED',marking:'NOT STARTED',feedback:'NOT STARTED',marksPct:0,status:'NOT STARTED'},
+  {id:12,subjId:5,name:'Assignment 1',type:'Assignment',due:'2025-04-10',submission:'NOT STARTED',marking:'NOT STARTED',feedback:'NOT STARTED',marksPct:0,status:'NOT STARTED'},
+];
+
+let clos = [
+  {id:1,subjId:1,clo:'CLO1',desc:'Apply BPM concepts to business processes',assessment:'Quiz 1, Test 1',assessed:62,achievement:75,target:70,status:'ACHIEVED'},
+  {id:2,subjId:1,clo:'CLO2',desc:'Analyse and redesign business processes',assessment:'Assignment 1',assessed:62,achievement:65,target:70,status:'AT RISK'},
+  {id:3,subjId:1,clo:'CLO3',desc:'Evaluate process improvement strategies',assessment:'Test 1',assessed:0,achievement:0,target:70,status:'BELOW TARGET'},
+  {id:4,subjId:3,clo:'CLO1',desc:'Interpret financial statements',assessment:'Quiz 1',assessed:38,achievement:58,target:65,status:'AT RISK'},
+  {id:5,subjId:3,clo:'CLO2',desc:'Apply financial analysis tools',assessment:'Assignment 1',assessed:0,achievement:0,target:65,status:'BELOW TARGET'},
+  {id:6,subjId:4,clo:'CLO1',desc:'Explain logistics management principles',assessment:'Practical 1',assessed:35,achievement:82,target:70,status:'ACHIEVED'},
+  {id:7,subjId:4,clo:'CLO2',desc:'Apply warehouse management techniques',assessment:'Mini Project',assessed:35,achievement:78,target:70,status:'ACHIEVED'},
+  {id:8,subjId:5,clo:'CLO1',desc:'Describe supply chain fundamentals',assessment:'Quiz 1',assessed:0,achievement:0,target:70,status:'BELOW TARGET'},
+];
+
+let topics = {
+  1:[{no:1,name:'Introduction to BPM',done:true},{no:2,name:'Process Modelling',done:true},{no:3,name:'Process Analysis',done:true},{no:4,name:'Process Re-engineering',done:false},{no:5,name:'BPM Tools & Technology',done:false},{no:6,name:'BPM Implementation',done:false}],
+  3:[{no:1,name:'Introduction to Finance',done:true},{no:2,name:'Time Value of Money',done:true},{no:3,name:'Financial Statements',done:false},{no:4,name:'Ratio Analysis',done:false},{no:5,name:'Capital Budgeting',done:false}],
+  4:[{no:1,name:'Intro to Logistics',done:true},{no:2,name:'Transportation Mgmt',done:true},{no:3,name:'Inventory Management',done:true},{no:4,name:'Warehouse Management',done:false},{no:5,name:'Distribution Networks',done:false}],
+  5:[{no:1,name:'Supply Chain Basics',done:true},{no:2,name:'Supply Chain Strategy',done:false},{no:3,name:'Supplier Management',done:false},{no:4,name:'Demand Planning',done:false},{no:5,name:'SCM Technology',done:false}],
+};
+
+let students = {
+  1:[{name:'Ahmad Firdaus',marks:82,grade:'A'},{name:'Nurul Ain',marks:76,grade:'A-'},{name:'Haziq Rahim',marks:55,grade:'C+'},{name:'Siti Hajar',marks:91,grade:'A+'},{name:'Zulaikha',marks:48,grade:'D'}],
+  3:[{name:'Faiz Asyraf',marks:61,grade:'B-'},{name:'Ain Syazwani',marks:54,grade:'C'},{name:'Hafizuddin',marks:45,grade:'D+'},{name:'Norsyawalina',marks:70,grade:'B'},{name:'Rashdan',marks:38,grade:'F'}],
+  4:[{name:'Amirul Hazwan',marks:88,grade:'A+'},{name:'Izati Nadhirah',marks:79,grade:'A-'},{name:'Khairul Anwar',marks:72,grade:'B+'},{name:'Maziana',marks:85,grade:'A'},{name:'Syakir Amri',marks:66,grade:'B-'}],
+  5:[{name:'Farhana Aziz',marks:52,grade:'C'},{name:'Izzat Hakim',marks:44,grade:'D'},{name:'Norhaslinda',marks:60,grade:'B-'},{name:'Rafiq Zulkifli',marks:55,grade:'C+'},{name:'Syafiqah',marks:49,grade:'D+'}],
+};
+
+let tasks = [
+  {id:1,name:'Prepare Test 1 paper (BPM)',subjId:1,due:'2025-04-28',priority:'HIGH',status:'PENDING',done:false},
+  {id:2,name:'Mark Assignment 1 (BPM â€“ DPB3B)',subjId:2,due:'2025-04-15',priority:'HIGH',status:'IN PROGRESS',done:false},
+  {id:3,name:'Conduct Quiz 2 (Business Finance)',subjId:3,due:'2025-04-20',priority:'MEDIUM',status:'PENDING',done:false},
+  {id:4,name:'Upload lecture notes to LMS (SCM)',subjId:5,due:'2025-04-10',priority:'HIGH',status:'PENDING',done:false},
+  {id:5,name:'Enter marks â€“ Practical 1 (Logistics)',subjId:4,due:'2025-04-08',priority:'MEDIUM',status:'PENDING',done:false},
+  {id:6,name:'Submit course documentation (BPM)',subjId:1,due:'2025-05-30',priority:'LOW',status:'PENDING',done:false},
+  {id:7,name:'Review CLO achievement (Finance)',subjId:3,due:'2025-04-25',priority:'MEDIUM',status:'PENDING',done:false},
+  {id:8,name:'Prepare revision materials (Logistics)',subjId:4,due:'2025-05-01',priority:'LOW',status:'PENDING',done:false},
+];
+
+let nextSubjId = 6, nextAssessId = 13, nextTaskId = 9;
+let editSubjectId = null;
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// UTILITIES
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+const statusBadge=(s)=>{
+  const m={
+    'ON TRACK':'badge-green','NEEDS ATTENTION':'badge-yellow','COMPLETED':'badge-blue',
+    'COMPLETED':'badge-blue','MARKING':'badge-purple','IN PROGRESS':'badge-teal',
+    'SUBMITTED':'badge-blue','OVERDUE':'badge-red','NOT STARTED':'badge-gray',
+    'ACHIEVED':'badge-green','AT RISK':'badge-yellow','BELOW TARGET':'badge-red',
+    'On Track':'badge-green','At Risk':'badge-yellow',
+    'PENDING':'badge-yellow','HIGH':'badge-red','MEDIUM':'badge-yellow','LOW':'badge-green',
+  };
+  return`<span class="badge ${m[s]||'badge-gray'}">${s}</span>`;
+};
+const progressBar=(pct,cls='progress-blue')=>`<div style="display:flex;align-items:center"><div class="progress-wrap" style="flex:1"><div class="progress-fill ${cls}" style="width:${pct}%"></div></div><span class="progress-pct">${pct}%</span></div>`;
+const subjectName=(id)=>{const s=subjects.find(x=>x.id===id);return s?`${s.code} ${s.cls}`:'â€”';};
+const today=()=>new Date().toISOString().slice(0,10);
+
+function toggleSection(id){const el=document.getElementById(id);el.style.display=el.style.display==='none'?'':'none';}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// FILTERS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function populateFilters(){
+  const fs=document.getElementById('fSubj');
+  const fc=document.getElementById('fClass');
+  const stuF=document.getElementById('stuSubjFilter');
+  const afS=document.getElementById('af-subj');
+  const tfS=document.getElementById('tf-subj');
+  [fs,fc,stuF,afS,tfS].forEach(el=>{if(el)el.innerHTML='';});
+  const allOpt=`<option value="">All Subjects</option>`;
+  if(fs)fs.innerHTML=allOpt;
+  const classes=new Set();
+  subjects.forEach(s=>{
+    if(fs)fs.innerHTML+=`<option value="${s.id}">${s.code} â€“ ${s.name} (${s.cls})</option>`;
+    if(stuF)stuF.innerHTML+=`<option value="${s.id}">${s.code} â€“ ${s.name} (${s.cls})</option>`;
+    if(afS)afS.innerHTML+=`<option value="${s.id}">${s.code} â€“ ${s.name} (${s.cls})</option>`;
+    if(tfS)tfS.innerHTML+=`<option value="${s.id}">${s.code} â€“ ${s.name} (${s.cls})</option>`;
+    classes.add(s.cls);
+  });
+  if(fc){fc.innerHTML='<option value="">All Classes</option>';classes.forEach(c=>fc.innerHTML+=`<option>${c}</option>`);}
+}
+
+function getFilteredSubjects(){
+  const fSubjVal=document.getElementById('fSubj').value;
+  const fClassVal=document.getElementById('fClass').value;
+  const fStatusVal=document.getElementById('fStatus').value;
+  return subjects.filter(s=>{
+    if(fSubjVal&&s.id!=fSubjVal)return false;
+    if(fClassVal&&s.cls!==fClassVal)return false;
+    if(fStatusVal&&s.status!==fStatusVal)return false;
+    return true;
+  });
+}
+
+function applyFilters(){renderAll();}
+function resetFilters(){
+  document.getElementById('fSubj').value='';
+  document.getElementById('fClass').value='';
+  document.getElementById('fStatus').value='';
+  renderAll();
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SUMMARY CARDS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function updateSummary(){
+  const fs=getFilteredSubjects();
+  document.getElementById('sc-subjects').textContent=fs.length;
+  document.getElementById('sc-classes').textContent=new Set(fs.map(s=>s.cls)).size;
+  document.getElementById('sc-students').textContent=fs.reduce((a,s)=>a+s.students,0);
+  const pending=tasks.filter(t=>t.status!=='COMPLETED'&&!t.done).length;
+  document.getElementById('sc-tasks').textContent=pending;
+  const assessPct=fs.length?Math.round(fs.reduce((a,s)=>a+s.assessPct,0)/fs.length):0;
+  document.getElementById('sc-assessment').textContent=assessPct+'%';
+  const subjIds=fs.map(s=>s.id);
+  const myClos=clos.filter(c=>subjIds.includes(c.subjId)&&c.achievement>0);
+  const cloAvg=myClos.length?Math.round(myClos.reduce((a,c)=>a+c.achievement,0)/myClos.length):0;
+  document.getElementById('sc-clo').textContent=cloAvg+'%';
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ALERTS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function renderAlerts(){
+  const list=[];
+  // Overdue assessments
+  assessments.filter(a=>a.status==='OVERDUE').forEach(a=>{
+    const s=subjects.find(x=>x.id===a.subjId);
+    list.push({type:'red',icon:'ðŸ”´',msg:`<strong>OVERDUE:</strong> ${a.name} â€“ ${s?s.code+' '+s.cls:'Unknown subject'} was due on ${a.due}`});
+  });
+  // Unmarked submissions
+  assessments.filter(a=>a.submission==='SUBMITTED'&&a.marking==='NOT STARTED').forEach(a=>{
+    const s=subjects.find(x=>x.id===a.subjId);
+    list.push({type:'yellow',icon:'ðŸŸ¡',msg:`<strong>UNMARKED:</strong> ${a.name} â€“ ${s?s.code+' '+s.cls:''} submitted but not yet marked`});
+  });
+  // Needs attention subjects
+  subjects.filter(s=>s.status==='NEEDS ATTENTION').forEach(s=>{
+    list.push({type:'yellow',icon:'âš ï¸',msg:`<strong>NEEDS ATTENTION:</strong> ${s.code} ${s.cls} â€“ ${s.name} (Teaching: ${s.teachPct}%, Assessment: ${s.assessPct}%)`});
+  });
+  // Low CLO achievement
+  clos.filter(c=>c.status==='BELOW TARGET'&&c.achievement>0).forEach(c=>{
+    const s=subjects.find(x=>x.id===c.subjId);
+    list.push({type:'red',icon:'ðŸ“‰',msg:`<strong>LOW CLO:</strong> ${c.clo} â€“ ${s?s.code:''} achievement ${c.achievement}% (target ${c.target}%)`});
+  });
+  // At-risk CLOs
+  clos.filter(c=>c.status==='AT RISK').forEach(c=>{
+    const s=subjects.find(x=>x.id===c.subjId);
+    list.push({type:'yellow',icon:'âš ï¸',msg:`<strong>AT RISK CLO:</strong> ${c.clo} â€“ ${s?s.code:''} at ${c.achievement}% (target ${c.target}%)`});
+  });
+  // Upcoming tasks (within 7 days)
+  const now=new Date();
+  tasks.filter(t=>!t.done&&t.due).forEach(t=>{
+    const diff=(new Date(t.due)-now)/(1000*60*60*24);
+    if(diff>=0&&diff<=7){
+      list.push({type:'blue',icon:'ðŸ“…',msg:`<strong>DUE SOON:</strong> "${t.name}" â€“ due ${t.due} (${Math.round(diff)} days)`});
+    }
+  });
+
+  const el=document.getElementById('alertsList');
+  if(list.length===0){el.innerHTML=`<div class="alert alert-green"><span class="alert-icon">âœ…</span><div>No urgent issues â€” everything is on track!</div></div>`;return;}
+  el.innerHTML=list.map(a=>`<div class="alert alert-${a.type}"><span class="alert-icon">${a.icon}</span><div>${a.msg}</div></div>`).join('');
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SECTION 1 â€“ SUBJECTS TABLE
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function renderSubjects(){
+  const fs=getFilteredSubjects();
+  const tb=document.getElementById('subjectTbody');
+  tb.innerHTML=fs.map(s=>`
+    <tr style="cursor:pointer" onclick="openDetailModal(${s.id})">
+      <td><strong>${s.code}</strong></td>
+      <td>${s.name}</td>
+      <td style="white-space:nowrap">${s.sem}</td>
+      <td><span class="badge badge-blue">${s.cls}</span></td>
+      <td>${s.students}</td>
+      <td style="max-width:160px;font-size:12px">${s.topic}</td>
+      <td style="min-width:120px">${progressBar(s.teachPct)}</td>
+      <td style="min-width:120px">${progressBar(s.assessPct,'progress-teal')}</td>
+      <td>${statusBadge(s.cloStatus)}</td>
+      <td style="font-size:12px">${s.nextTask}</td>
+      <td>${statusBadge(s.status)}</td>
+      <td onclick="event.stopPropagation()">
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-secondary btn-sm" onclick="editSubject(${s.id})">âœï¸</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteSubject(${s.id})">ðŸ—‘</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SECTION 2 â€“ TEACHING PROGRESS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function renderTeaching(){
+  const fs=getFilteredSubjects();
+  const el=document.getElementById('teachingCards');
+  el.innerHTML=fs.map(s=>{
+    const tList=topics[s.id]||[];
+    const done=tList.filter(t=>t.done).length;
+    const total=tList.length||6;
+    const pct=total?Math.round(done/total*100):s.teachPct;
+    const tRows=tList.length?tList.map(t=>`
+      <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f0f4f8">
+        <span style="font-size:16px">${t.done?'âœ…':'â¬œ'}</span>
+        <span style="flex:1;font-size:13px;color:${t.done?'#057a55':'#1f2328'}">${t.no}. ${t.name}</span>
+        <span class="badge ${t.done?'badge-green':'badge-gray'}">${t.done?'Done':'Pending'}</span>
+      </div>`).join(''):`<div style="font-size:13px;color:#9ca3af;padding:8px 0">No topic data available. Edit subject to add details.</div>`;
+    return`<div class="section" style="margin-bottom:14px">
+      <div class="section-header">
+        <div class="section-title">${s.code} â€“ ${s.name} <span class="badge badge-blue" style="margin-left:6px">${s.cls}</span></div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:12px;color:#57606a">Topics: ${done}/${total}</span>
+          ${progressBar(pct)}
+        </div>
+      </div>
+      <div class="section-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:14px">
+          <div style="background:#f8fafc;border-radius:8px;padding:10px"><div style="font-size:11px;color:#57606a;font-weight:600">CURRENT TOPIC</div><div style="font-size:13px;font-weight:600;margin-top:2px">${s.topic}</div></div>
+          <div style="background:#f8fafc;border-radius:8px;padding:10px"><div style="font-size:11px;color:#57606a;font-weight:600">COMPLETED</div><div style="font-size:22px;font-weight:800;color:#1a4a7a">${done} <span style="font-size:13px;font-weight:400">topics</span></div></div>
+          <div style="background:#f8fafc;border-radius:8px;padding:10px"><div style="font-size:11px;color:#57606a;font-weight:600">REMAINING</div><div style="font-size:22px;font-weight:800;color:#d97706">${total-done} <span style="font-size:13px;font-weight:400">topics</span></div></div>
+          <div style="background:#f8fafc;border-radius:8px;padding:10px"><div style="font-size:11px;color:#57606a;font-weight:600">PROGRESS</div><div style="font-size:22px;font-weight:800;color:#059669">${pct}%</div></div>
+        </div>
+        ${tRows}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SECTION 3 â€“ ASSESSMENTS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function renderAssessments(){
+  const fs=getFilteredSubjects();
+  const ids=fs.map(s=>s.id);
+  const fa=assessments.filter(a=>ids.includes(a.subjId));
+  const tb=document.getElementById('assessmentTbody');
+  tb.innerHTML=fa.map(a=>{
+    const s=subjects.find(x=>x.id===a.subjId);
+    const pct=a.marksPct;
+    const barCls=pct>=80?'progress-green':pct>=50?'progress-teal':'progress-red';
+    return`<tr>
+      <td style="white-space:nowrap">${s?`<strong>${s.code}</strong><br><span style="font-size:11px;color:#57606a">${s.cls}</span>`:''}</td>
+      <td><strong>${a.name}</strong></td>
+      <td><span class="badge badge-gray">${a.type}</span></td>
+      <td style="white-space:nowrap">${a.due}</td>
+      <td>${statusBadge(a.submission)}</td>
+      <td>${statusBadge(a.marking)}</td>
+      <td>${statusBadge(a.feedback)}</td>
+      <td style="min-width:120px">${progressBar(pct,barCls)}</td>
+      <td>${statusBadge(a.status)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SECTION 4 â€“ CLO
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function renderCLO(){
+  const fs=getFilteredSubjects();
+  const el=document.getElementById('cloCards');
+  el.innerHTML=fs.map(s=>{
+    const sc=clos.filter(c=>c.subjId===s.id);
+    if(!sc.length)return`<div class="section" style="margin-bottom:14px"><div class="section-header"><div class="section-title">${s.code} â€“ ${s.name} <span class="badge badge-blue" style="margin-left:6px">${s.cls}</span></div></div><div class="section-body" style="color:#9ca3af;font-size:13px">No CLO data recorded for this subject yet.</div></div>`;
+    const bars=sc.map(c=>{
+      const pct=c.achievement;
+      const tpct=c.target;
+      const cls=c.status==='ACHIEVED'?'progress-green':c.status==='AT RISK'?'progress-yellow':'progress-red';
+      const left=`${Math.min(tpct,98)}%`;
+      return`<div class="clo-item">
+        <div class="clo-header">
+          <span>${c.clo}: ${c.desc}</span>
+          <span style="display:flex;gap:8px;align-items:center">${statusBadge(c.status)}<span style="font-size:12px;color:#57606a">${pct}% / Target ${tpct}%</span></span>
+        </div>
+        <div class="clo-bar-wrap">
+          <div class="clo-bar-fill ${cls}" style="width:${pct}%">${pct>10?pct+'%':''}</div>
+          <div class="clo-target-line" style="left:${left}"><span class="clo-target-label">Target ${tpct}%</span></div>
+        </div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:4px">Assessment: ${c.assessment} | Students assessed: ${c.assessed}</div>
+      </div>`;
+    }).join('');
+    return`<div class="section" style="margin-bottom:14px">
+      <div class="section-header"><div class="section-title">${s.code} â€“ ${s.name} <span class="badge badge-blue" style="margin-left:6px">${s.cls}</span></div></div>
+      <div class="section-body">${bars}</div>
+    </div>`;
+  }).join('');
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SECTION 5 â€“ STUDENTS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function renderStudents(){
+  const filter=document.getElementById('stuSubjFilter').value;
+  const fs=filter?subjects.filter(s=>s.id==filter):getFilteredSubjects();
+  const el=document.getElementById('studentCards');
+  el.innerHTML=fs.map(s=>{
+    const sts=students[s.id]||[];
+    if(!sts.length)return`<div class="section" style="margin-bottom:14px"><div class="section-header"><div class="section-title">${s.code} â€“ ${s.name} <span class="badge badge-blue" style="margin-left:6px">${s.cls}</span></div></div><div class="section-body" style="font-size:13px;color:#9ca3af">No student performance data available (showing ${s.students} enrolled).</div></div>`;
+    const marks=sts.map(x=>x.marks);
+    const avg=Math.round(marks.reduce((a,b)=>a+b,0)/marks.length);
+    const high=Math.max(...marks);const low=Math.min(...marks);
+    const pass=sts.filter(x=>x.marks>=50).length;
+    const passPct=Math.round(pass/sts.length*100);
+    const highPerformers=sts.filter(x=>x.marks>=75).sort((a,b)=>b.marks-a.marks);
+    const attention=sts.filter(x=>x.marks<50).sort((a,b)=>a.marks-b.marks);
+    return`<div class="section" style="margin-bottom:14px">
+      <div class="section-header"><div class="section-title">${s.code} â€“ ${s.name} <span class="badge badge-blue" style="margin-left:6px">${s.cls}</span></div></div>
+      <div class="section-body">
+        <div class="detail-grid" style="margin-bottom:16px">
+          <div class="detail-card"><div class="val">${avg}%</div><div class="lbl">Average Marks</div></div>
+          <div class="detail-card"><div class="val" style="color:#059669">${high}%</div><div class="lbl">Highest Marks</div></div>
+          <div class="detail-card"><div class="val" style="color:#dc2626">${low}%</div><div class="lbl">Lowest Marks</div></div>
+          <div class="detail-card"><div class="val" style="color:#2563a8">${passPct}%</div><div class="lbl">Pass Rate</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#057a55;margin-bottom:8px">ðŸ† High Performers (â‰¥75%)</div>
+            ${highPerformers.length?highPerformers.map(x=>`<div class="student-row"><span>${x.name}</span><span style="display:flex;gap:6px;align-items:center"><strong>${x.marks}%</strong> <span class="badge badge-green">${x.grade}</span></span></div>`).join(''):`<div style="font-size:12px;color:#9ca3af">None in sample data</div>`}
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#dc2626;margin-bottom:8px">âš ï¸ Needs Attention (&lt;50%)</div>
+            ${attention.length?attention.map(x=>`<div class="student-row"><span>${x.name}</span><span style="display:flex;gap:6px;align-items:center"><strong>${x.marks}%</strong> <span class="badge badge-red">${x.grade}</span></span></div>`).join(''):`<div style="font-size:12px;color:#9ca3af">None â€” all above 50%</div>`}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SECTION 6 â€“ TASKS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function renderTasks(){
+  const tb=document.getElementById('taskTbody');
+  tb.innerHTML=tasks.map(t=>`
+    <tr style="${t.done?'opacity:.55':''}">
+      <td><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${t.id},this.checked)"/></td>
+      <td class="${t.done?'checklist-label done':'checklist-label'}"><strong>${t.name}</strong></td>
+      <td style="font-size:12px">${subjectName(t.subjId)}</td>
+      <td style="white-space:nowrap;font-size:12px">${t.due||'â€”'}</td>
+      <td>${statusBadge(t.priority)}</td>
+      <td>${statusBadge(t.done?'COMPLETED':t.status)}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteTask(${t.id})">ðŸ—‘</button></td>
+    </tr>`).join('');
+}
+
+function toggleTask(id,checked){
+  const t=tasks.find(x=>x.id===id);
+  if(t){t.done=checked;t.status=checked?'COMPLETED':'PENDING';}
+  renderTasks();updateSummary();
+}
+function deleteTask(id){if(confirm('Delete this task?')){tasks=tasks.filter(t=>t.id!==id);renderTasks();updateSummary();}}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// DETAIL MODAL
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function openDetailModal(id){
+  const s=subjects.find(x=>x.id===id);if(!s)return;
+  document.getElementById('detailModalTitle').textContent=`${s.code} â€“ ${s.name} (${s.cls})`;
+  const sc=clos.filter(c=>c.subjId===s.id);
+  const sa=assessments.filter(a=>a.subjId===s.id);
+  const sts=students[s.id]||[];
+  const tList=topics[s.id]||[];
+  const sTasks=tasks.filter(t=>t.subjId===s.id&&!t.done);
+  const marks=sts.map(x=>x.marks);
+  const avg=marks.length?Math.round(marks.reduce((a,b)=>a+b,0)/marks.length):'â€”';
+  const hi=marks.length?Math.max(...marks):'â€”';
+  const lo=marks.length?Math.min(...marks):'â€”';
+  const pass=marks.length?Math.round(sts.filter(x=>x.marks>=50).length/sts.length*100)+'%':'â€”';
+  const done=tList.filter(t=>t.done).length;
+  const total=tList.length||'N/A';
+  document.getElementById('detailModalBody').innerHTML=`
+    <div class="modal-section">
+      <h4>Subject Information</h4>
+      <div class="detail-grid">
+        <div class="detail-card"><div class="val">${s.code}</div><div class="lbl">Subject Code</div></div>
+        <div class="detail-card"><div class="val">${s.cls}</div><div class="lbl">Class</div></div>
+        <div class="detail-card"><div class="val">${s.students}</div><div class="lbl">Students</div></div>
+        <div class="detail-card"><div class="val">${s.teachPct}%</div><div class="lbl">Teaching Progress</div></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <h4>Teaching Progress</h4>
+      ${progressBar(s.teachPct)}
+      <div style="margin-top:10px;font-size:13px"><strong>Current:</strong> ${s.topic} &nbsp;|&nbsp; <strong>Completed:</strong> ${done} topics &nbsp;|&nbsp; <strong>Remaining:</strong> ${typeof total==='number'?total-done:'â€”'}</div>
+    </div>
+    <div class="modal-section">
+      <h4>Assessments (${sa.length})</h4>
+      ${sa.length?`<div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Type</th><th>Due</th><th>Status</th><th>Marks %</th></tr></thead><tbody>${sa.map(a=>`<tr><td>${a.name}</td><td>${a.type}</td><td>${a.due}</td><td>${statusBadge(a.status)}</td><td>${progressBar(a.marksPct)}</td></tr>`).join('')}</tbody></table></div>`:'<p style="font-size:13px;color:#9ca3af">No assessments recorded.</p>'}
+    </div>
+    <div class="modal-section">
+      <h4>CLO Achievement</h4>
+      ${sc.length?sc.map(c=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span><strong>${c.clo}:</strong> ${c.desc}</span>${statusBadge(c.status)}</div>${progressBar(c.achievement,c.status==='ACHIEVED'?'progress-green':c.status==='AT RISK'?'progress-yellow':'progress-red')}</div>`).join(''):'<p style="font-size:13px;color:#9ca3af">No CLO data recorded.</p>'}
+    </div>
+    <div class="modal-section">
+      <h4>Student Performance (Sample)</h4>
+      <div class="detail-grid">
+        <div class="detail-card"><div class="val">${avg}</div><div class="lbl">Average</div></div>
+        <div class="detail-card"><div class="val" style="color:#059669">${hi}</div><div class="lbl">Highest</div></div>
+        <div class="detail-card"><div class="val" style="color:#dc2626">${lo}</div><div class="lbl">Lowest</div></div>
+        <div class="detail-card"><div class="val" style="color:#2563a8">${pass}</div><div class="lbl">Pass Rate</div></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <h4>Upcoming Tasks</h4>
+      ${sTasks.length?`<div class="tbl-wrap"><table><thead><tr><th>Task</th><th>Due</th><th>Priority</th><th>Status</th></tr></thead><tbody>${sTasks.map(t=>`<tr><td>${t.name}</td><td>${t.due}</td><td>${statusBadge(t.priority)}</td><td>${statusBadge(t.status)}</td></tr>`).join('')}</tbody></table></div>`:'<p style="font-size:13px;color:#9ca3af">No pending tasks.</p>'}
+    </div>`;
+  document.getElementById('detailModal').classList.add('open');
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SUBJECT CRUD
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function openAddSubjectModal(){
+  editSubjectId=null;
+  document.getElementById('subjectModalTitle').textContent='Add Subject';
+  document.getElementById('subjectForm').reset();
+  document.getElementById('subjectModal').classList.add('open');
+}
+function editSubject(id){
+  const s=subjects.find(x=>x.id===id);if(!s)return;
+  editSubjectId=id;
+  document.getElementById('subjectModalTitle').textContent='Edit Subject';
+  document.getElementById('sf-code').value=s.code;
+  document.getElementById('sf-name').value=s.name;
+  document.getElementById('sf-sem').value=s.sem;
+  document.getElementById('sf-class').value=s.cls;
+  document.getElementById('sf-students').value=s.students;
+  document.getElementById('sf-topic').value=s.topic;
+  document.getElementById('sf-teach').value=s.teachPct;
+  document.getElementById('sf-assess').value=s.assessPct;
+  document.getElementById('sf-clo').value=s.cloStatus;
+  document.getElementById('sf-next').value=s.nextTask;
+  document.getElementById('sf-status').value=s.status;
+  document.getElementById('subjectModal').classList.add('open');
+}
+function saveSubject(e){
+  e.preventDefault();
+  const data={
+    code:document.getElementById('sf-code').value.trim(),
+    name:document.getElementById('sf-name').value.trim(),
+    sem:document.getElementById('sf-sem').value.trim(),
+    cls:document.getElementById('sf-class').value.trim(),
+    students:parseInt(document.getElementById('sf-students').value)||0,
+    topic:document.getElementById('sf-topic').value.trim(),
+    teachPct:parseInt(document.getElementById('sf-teach').value)||0,
+    assessPct:parseInt(document.getElementById('sf-assess').value)||0,
+    cloStatus:document.getElementById('sf-clo').value,
+    nextTask:document.getElementById('sf-next').value.trim(),
+    status:document.getElementById('sf-status').value,
+  };
+  if(editSubjectId){
+    const idx=subjects.findIndex(s=>s.id===editSubjectId);
+    if(idx>=0)subjects[idx]={...subjects[idx],...data};
+  }else{
+    subjects.push({id:nextSubjId++,...data});
+  }
+  closeModal('subjectModal');
+  populateFilters();renderAll();
+}
+function deleteSubject(id){
+  if(!confirm('Delete this subject and all its data?'))return;
+  subjects=subjects.filter(s=>s.id!==id);
+  assessments=assessments.filter(a=>a.subjId!==id);
+  tasks=tasks.filter(t=>t.subjId!==id);
+  populateFilters();renderAll();
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ASSESSMENT CRUD
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function openAddAssessmentModal(){
+  document.getElementById('assessmentModal').classList.add('open');
+}
+function saveAssessment(e){
+  e.preventDefault();
+  const subjId=parseInt(document.getElementById('af-subj').value);
+  assessments.push({
+    id:nextAssessId++,subjId,
+    name:document.getElementById('af-name').value.trim(),
+    type:document.getElementById('af-type').value,
+    due:document.getElementById('af-due').value,
+    submission:document.getElementById('af-sub').value,
+    marking:document.getElementById('af-mark').value,
+    feedback:document.getElementById('af-feed').value,
+    marksPct:parseInt(document.getElementById('af-pct').value)||0,
+    status:document.getElementById('af-sub').value,
+  });
+  closeModal('assessmentModal');
+  document.getElementById('assessmentForm').reset();
+  renderAssessments();renderAlerts();updateSummary();
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// TASK CRUD
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function openAddTaskModal(){
+  document.getElementById('taskModal').classList.add('open');
+}
+function saveTask(e){
+  e.preventDefault();
+  tasks.push({
+    id:nextTaskId++,
+    name:document.getElementById('tf-name').value.trim(),
+    subjId:parseInt(document.getElementById('tf-subj').value)||null,
+    due:document.getElementById('tf-due').value,
+    priority:document.getElementById('tf-pri').value,
+    status:document.getElementById('tf-status').value,
+    done:false,
+  });
+  closeModal('taskModal');
+  document.getElementById('taskForm').reset();
+  renderTasks();updateSummary();
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// TABS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='teaching')renderTeaching();
+  if(name==='clo')renderCLO();
+  if(name==='students')renderStudents();
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// MODALS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});
+});
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// CLOCK
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function updateClock(){
+  const d=new Date();
+  document.getElementById('clockBadge').textContent=d.toLocaleDateString('en-MY',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit'});
+}
+setInterval(updateClock,1000);updateClock();
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// RENDER ALL
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function renderAll(){
+  updateSummary();
+  renderAlerts();
+  renderSubjects();
+  renderAssessments();
+  renderTasks();
+  // Teaching, CLO, Students render on tab switch
+}
+
+// INIT
+populateFilters();
+renderAll();
+</script>
+
+<footer style="text-align:center;padding:24px 0 16px;font-size:11px;color:#9ca3af;border-top:1px solid #e5e7eb;margin-top:8px">
+  âš ï¸ All data shown is <strong>SAMPLE DATA</strong> for demonstration purposes only &nbsp;â€¢&nbsp; Made with IBM Bob
+</footer>
+</body>
+</html>
