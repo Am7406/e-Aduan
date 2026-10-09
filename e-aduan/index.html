@@ -558,77 +558,249 @@ tr:last-child td{border-bottom:none}
     <div class="page" id="page-submit">
       <div class="page-header">
         <div class="page-title">âœï¸ Submit a Complaint</div>
-        <div class="page-sub">Fill in the details below. All fields marked <span style="color:var(--red)">*</span> are required.</div>
+        <div class="page-sub">Complete all required fields. You will be able to review before submitting.</div>
       </div>
-      <div class="demo-banner">âš  <strong>SAMPLE FORM</strong> â€” Submissions are not saved to a real database in this demo.</div>
+      <div class="demo-banner">âš  <strong>DEMO MODE</strong> â€” Submissions update the in-session complaint list only. No data is sent to a server or stored permanently.</div>
 
-      <form id="submit-form" onsubmit="submitComplaint(event)">
-        <div class="form-section">
-          <h3>ðŸ“‹ Complainant Information</h3>
-          <div class="form-grid">
-            <div class="form-group"><label>Full Name <span class="form-required">*</span></label><input id="f-name" required placeholder="e.g. Ahmad bin Abdullah"/></div>
-            <div class="form-group"><label>IC / Staff / Student No. <span class="form-required">*</span></label><input id="f-ic" required placeholder="e.g. 990112-14-5678"/></div>
-            <div class="form-group"><label>Email Address <span class="form-required">*</span></label><input id="f-email" type="email" required placeholder="e.g. ahmad@example.com"/></div>
-            <div class="form-group"><label>Phone Number</label><input id="f-phone" placeholder="e.g. 012-3456789"/></div>
-            <div class="form-group"><label>Department / Unit</label><input id="f-dept" placeholder="e.g. Department of Commerce"/></div>
-            <div class="form-group"><label>Preferred Contact</label>
-              <select id="f-contact"><option>Email</option><option>Phone</option><option>Both</option></select>
-            </div>
+      <!-- STEP INDICATOR -->
+      <div id="submit-steps" style="display:flex;gap:0;margin-bottom:22px;background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden">
+        <div class="step-item active" id="step-ind-1" style="flex:1;padding:12px 8px;text-align:center;font-size:12px;font-weight:700;border-right:1px solid var(--border);cursor:default">
+          <div style="font-size:18px;margin-bottom:2px">1</div>Complainant
+        </div>
+        <div class="step-item" id="step-ind-2" style="flex:1;padding:12px 8px;text-align:center;font-size:12px;font-weight:700;border-right:1px solid var(--border);cursor:default;color:var(--muted)">
+          <div style="font-size:18px;margin-bottom:2px">2</div>Details
+        </div>
+        <div class="step-item" id="step-ind-3" style="flex:1;padding:12px 8px;text-align:center;font-size:12px;font-weight:700;border-right:1px solid var(--border);cursor:default;color:var(--muted)">
+          <div style="font-size:18px;margin-bottom:2px">3</div>Documents
+        </div>
+        <div class="step-item" id="step-ind-4" style="flex:1;padding:12px 8px;text-align:center;font-size:12px;font-weight:700;cursor:default;color:var(--muted)">
+          <div style="font-size:18px;margin-bottom:2px">4</div>Review
+        </div>
+      </div>
+
+      <!-- GLOBAL FORM ERROR BANNER -->
+      <div id="form-error-banner" style="display:none" class="alert alert-red" role="alert">
+        <span class="alert-icon">âš ï¸</span>
+        <div id="form-error-text">Please correct the errors below before continuing.</div>
+      </div>
+
+      <!-- â”€â”€ STEP 1: COMPLAINANT â”€â”€ -->
+      <div id="submit-step-1">
+
+        <!-- ANONYMOUS TOGGLE -->
+        <div class="form-section" style="border-left:4px solid var(--teal)">
+          <h3>ðŸ•µï¸ Reporting Mode</h3>
+          <div style="display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap">
+            <label class="toggle-wrap" style="align-items:flex-start;gap:12px">
+              <label class="toggle" style="margin-top:2px"><input type="checkbox" id="f-anonymous" onchange="toggleAnonymous()"/><span class="toggle-slider"></span></label>
+              <div>
+                <div style="font-size:13px;font-weight:600">Submit Anonymously</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px;max-width:520px">Your name and contact details will not appear in the complaint record. However, <strong>system logs and network metadata may still be collected by the organisation's infrastructure</strong>. True anonymity cannot be guaranteed.</div>
+              </div>
+            </label>
+          </div>
+          <div id="anon-tracking-note" style="display:none;margin-top:12px" class="alert alert-blue">
+            <span class="alert-icon">â„¹ï¸</span>
+            <div style="font-size:12px"><strong>Tracking anonymous complaints:</strong> After submission you will receive a reference number (e.g. EA-2026-0042). Keep it to track your complaint using the Track Complaint page â€” no account or email required.</div>
           </div>
         </div>
 
         <div class="form-section">
+          <h3>ðŸ“‹ Complainant Information</h3>
+          <div id="anon-banner" style="display:none;margin-bottom:14px" class="alert alert-amber">
+            <span class="alert-icon">ðŸ•µï¸</span>
+            <div style="font-size:12px"><strong>Anonymous mode:</strong> Fields marked optional below are hidden from the complaint record. Email and phone are not required but providing them allows investigators to contact you if more information is needed.</div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group" id="fg-name">
+              <label>Full Name <span class="form-required" id="req-name">*</span></label>
+              <input id="f-name" placeholder="e.g. Ahmad bin Abdullah"/>
+              <div class="field-error" id="err-name" style="display:none;color:var(--red);font-size:11px;margin-top:3px"></div>
+            </div>
+            <div class="form-group" id="fg-ic">
+              <label>IC / Staff / Student No. <span class="form-required" id="req-ic">*</span></label>
+              <input id="f-ic" placeholder="e.g. 990112-14-5678"/>
+              <div class="field-error" id="err-ic" style="display:none;color:var(--red);font-size:11px;margin-top:3px"></div>
+            </div>
+            <div class="form-group">
+              <label>Email Address <span class="form-required" id="req-email">*</span></label>
+              <input id="f-email" type="email" placeholder="e.g. ahmad@example.com"/>
+              <div class="field-error" id="err-email" style="display:none;color:var(--red);font-size:11px;margin-top:3px"></div>
+            </div>
+            <div class="form-group">
+              <label>Phone Number <span id="opt-phone" style="font-size:11px;color:var(--muted)">(Optional)</span></label>
+              <input id="f-phone" placeholder="e.g. 012-3456789"/>
+            </div>
+            <div class="form-group">
+              <label>Department / Unit <span style="font-size:11px;color:var(--muted)">(Optional)</span></label>
+              <input id="f-dept" placeholder="e.g. Department of Commerce"/>
+            </div>
+            <div class="form-group">
+              <label>Preferred Contact Method</label>
+              <select id="f-contact"><option>Email</option><option>Phone</option><option>Both</option><option>None (Anonymous)</option></select>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn btn-teal" onclick="goStep(2)">Next: Complaint Details â†’</button>
+        </div>
+      </div><!-- /step 1 -->
+
+      <!-- â”€â”€ STEP 2: COMPLAINT DETAILS â”€â”€ -->
+      <div id="submit-step-2" style="display:none">
+        <div class="form-section">
           <h3>ðŸ“Œ Complaint Details</h3>
           <div class="form-grid">
-            <div class="form-group"><label>Complaint Category <span class="form-required">*</span></label>
-              <select id="f-category" required>
+            <div class="form-group">
+              <label>Complaint Category <span class="form-required">*</span></label>
+              <select id="f-category" onchange="suggestPriority()">
                 <option value="">â€” Select Category â€”</option>
                 <option>Facilities</option><option>Customer Service</option><option>ICT / System</option>
                 <option>Finance / Billing</option><option>Staff Conduct / Integrity</option><option>Safety</option><option>Other</option>
               </select>
+              <div class="field-error" id="err-category" style="display:none;color:var(--red);font-size:11px;margin-top:3px"></div>
             </div>
-            <div class="form-group"><label>Priority</label>
-              <select id="f-priority"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option></select>
+            <div class="form-group">
+              <label>Priority <span style="font-size:11px;color:var(--muted)">(auto-suggested)</span></label>
+              <select id="f-priority">
+                <option value="Low">Low â€” informational, no urgency</option>
+                <option value="Medium" selected>Medium â€” affects daily work</option>
+                <option value="High">High â€” significant disruption</option>
+                <option value="Critical">Critical â€” safety risk / major system failure</option>
+              </select>
+              <div id="priority-hint" style="font-size:11px;color:var(--teal);margin-top:3px;display:none"></div>
             </div>
-            <div class="form-group"><label>Incident Date <span class="form-required">*</span></label><input id="f-date" type="date" required/></div>
-            <div class="form-group"><label>Location / Unit</label><input id="f-location" placeholder="e.g. Block A, Level 2"/></div>
-            <div class="form-group full"><label>Complaint Title <span class="form-required">*</span></label><input id="f-title" required placeholder="Brief title of your complaint (max 100 characters)" maxlength="100"/></div>
-            <div class="form-group full"><label>Detailed Description <span class="form-required">*</span></label>
-              <textarea id="f-desc" required placeholder="Describe the complaint in detail. Include relevant dates, people involved, and what action you expect." rows="5"></textarea>
+            <div class="form-group">
+              <label>Incident Date <span class="form-required">*</span></label>
+              <input id="f-date" type="date"/>
+              <div class="field-error" id="err-date" style="display:none;color:var(--red);font-size:11px;margin-top:3px"></div>
             </div>
-            <div class="form-group full"><label>Expected Resolution</label>
-              <textarea id="f-expected" placeholder="What outcome do you expect from this complaint?" rows="2"></textarea>
+            <div class="form-group">
+              <label>Incident Time <span style="font-size:11px;color:var(--muted)">(Optional)</span></label>
+              <input id="f-time" type="time"/>
+            </div>
+            <div class="form-group">
+              <label>Location / Department <span class="form-required">*</span></label>
+              <input id="f-location" placeholder="e.g. Block A, Level 2 â€” Admin Counter"/>
+              <div class="field-error" id="err-location" style="display:none;color:var(--red);font-size:11px;margin-top:3px"></div>
+            </div>
+            <div class="form-group">
+              <label>Persons Involved <span style="font-size:11px;color:var(--muted)">(Optional)</span></label>
+              <input id="f-persons" placeholder="e.g. Staff at counter, name unknown"/>
+            </div>
+            <div class="form-group full">
+              <label>Complaint Title <span class="form-required">*</span></label>
+              <input id="f-title" placeholder="Brief, clear title â€” max 120 characters" maxlength="120" oninput="updateCharCount()"/>
+              <div style="display:flex;justify-content:space-between;margin-top:3px">
+                <div class="field-error" id="err-title" style="display:none;color:var(--red);font-size:11px"></div>
+                <div id="title-count" style="font-size:11px;color:var(--muted);margin-left:auto">0 / 120</div>
+              </div>
+            </div>
+            <div class="form-group full">
+              <label>Detailed Description <span class="form-required">*</span></label>
+              <textarea id="f-desc" placeholder="Describe the complaint in detail. Include: what happened, when, who was involved, what steps you already took, and the impact on you or others." rows="6" oninput="updateDescCount()"></textarea>
+              <div style="display:flex;justify-content:space-between;margin-top:3px">
+                <div class="field-error" id="err-desc" style="display:none;color:var(--red);font-size:11px"></div>
+                <div id="desc-count" style="font-size:11px;color:var(--muted);margin-left:auto">0 chars (min 30)</div>
+              </div>
+            </div>
+            <div class="form-group full">
+              <label>Expected Resolution <span style="font-size:11px;color:var(--muted)">(Optional)</span></label>
+              <textarea id="f-expected" placeholder="What outcome do you expect? e.g. Repair of equipment, apology, refund, investigation." rows="2"></textarea>
             </div>
           </div>
         </div>
 
+        <!-- CONFIDENTIALITY -->
         <div class="form-section">
-          <h3>ðŸ“Ž Supporting Documents (Optional)</h3>
+          <h3>ðŸ”’ Confidentiality Level</h3>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Choose the appropriate confidentiality level. <strong>Note:</strong> confidentiality labels alone do not enforce access restrictions â€” backend permissions control actual access in production.</p>
+          <div style="display:flex;flex-direction:column;gap:10px" id="conf-options">
+            <label style="display:flex;align-items:flex-start;gap:12px;padding:14px;border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color .15s" id="conf-opt-normal">
+              <input type="radio" name="f-confidential" value="Normal" checked style="margin-top:3px;accent-color:var(--teal)" onchange="updateConfUI()"/>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--text)">ðŸŒ Normal Complaint</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px">Visible to staff assigned to handle complaints and to supervisors. Standard complaint processing applies.</div>
+              </div>
+            </label>
+            <label style="display:flex;align-items:flex-start;gap:12px;padding:14px;border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color .15s" id="conf-opt-conf">
+              <input type="radio" name="f-confidential" value="Confidential" style="margin-top:3px;accent-color:var(--teal)" onchange="updateConfUI()"/>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--amber)">ðŸ”’ Confidential Complaint</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px">Visible only to designated complaint officers and department heads. Details are not shared with uninvolved parties. Use for sensitive personal or workplace matters.</div>
+              </div>
+            </label>
+            <label style="display:flex;align-items:flex-start;gap:12px;padding:14px;border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color .15s" id="conf-opt-hconf">
+              <input type="radio" name="f-confidential" value="Highly Confidential" style="margin-top:3px;accent-color:var(--teal)" onchange="updateConfUI()"/>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--red)">ðŸ” Highly Confidential</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px">Restricted to the Head of Integrity Unit and top management only. Use for complaints involving serious misconduct, corruption, or matters under legal consideration. All access is logged.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <button class="btn btn-secondary" onclick="goStep(1)">â† Back</button>
+          <button class="btn btn-teal" onclick="goStep(3)">Next: Attach Documents â†’</button>
+        </div>
+      </div><!-- /step 2 -->
+
+      <!-- â”€â”€ STEP 3: DOCUMENTS â”€â”€ -->
+      <div id="submit-step-3" style="display:none">
+        <div class="form-section">
+          <h3>ðŸ“Ž Supporting Documents <span style="font-size:12px;font-weight:400;color:var(--muted)">(Optional â€” max 5 files, 10 MB each, 30 MB total)</span></h3>
           <div class="upload-zone" onclick="document.getElementById('file-input').click()" id="drop-zone">
             <div class="upload-zone-icon">ðŸ“</div>
-            <p><strong>Click to upload</strong> or drag and drop files here</p>
-            <p>Supported: PDF, JPG, PNG, DOCX, XLSX (max 10MB each)</p>
+            <p><strong>Click to select files</strong> or drag and drop here</p>
+            <p style="font-size:12px;color:var(--muted);margin-top:4px">Accepted: PDF Â· JPG Â· JPEG Â· PNG Â· DOCX &nbsp;|&nbsp; Max 10 MB per file Â· 30 MB total Â· 5 files max</p>
           </div>
-          <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx" style="display:none" onchange="handleFiles(this.files)"/>
+          <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.docx" style="display:none" onchange="handleFiles(this.files)"/>
+          <div id="upload-error" style="display:none;margin-top:10px" class="alert alert-red">
+            <span class="alert-icon">âš ï¸</span><div id="upload-error-text"></div>
+          </div>
           <div id="file-list" style="margin-top:12px"></div>
-        </div>
-
-        <div class="form-section">
-          <h3>ðŸ”’ Confidentiality</h3>
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-            <label class="toggle-wrap">
-              <label class="toggle"><input type="checkbox" id="f-confidential"/><span class="toggle-slider"></span></label>
-              <span style="font-size:13px">Mark as Confidential Complaint</span>
-            </label>
-            <span style="font-size:12px;color:var(--muted)">Confidential complaints are only visible to authorized personnel.</span>
+          <div id="upload-summary" style="display:none;margin-top:8px;font-size:12px;color:var(--muted)"></div>
+          <div style="margin-top:14px;padding:12px 14px;background:#f8fafc;border-radius:8px;font-size:12px;color:var(--muted);border:1px solid var(--border)">
+            <strong style="color:var(--navy)">ðŸ”’ Security note:</strong> In production, files are uploaded over encrypted HTTPS to secure backend storage. Files are never accessible through public URLs. Access is restricted to authorised complaint officers only. <em>(In this demo, files are selected locally and not transmitted anywhere.)</em>
           </div>
         </div>
 
-        <div style="display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap">
-          <button type="button" class="btn btn-secondary" onclick="document.getElementById('submit-form').reset();document.getElementById('file-list').innerHTML=''">Clear Form</button>
-          <button type="submit" class="btn btn-teal">ðŸ“¤ Submit Complaint</button>
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <button class="btn btn-secondary" onclick="goStep(2)">â† Back</button>
+          <button class="btn btn-teal" onclick="goStep(4)">Review Before Submitting â†’</button>
         </div>
-      </form>
+      </div><!-- /step 3 -->
+
+      <!-- â”€â”€ STEP 4: REVIEW â”€â”€ -->
+      <div id="submit-step-4" style="display:none">
+        <div class="form-section" style="border-left:4px solid var(--teal)">
+          <h3>ðŸ” Review Your Complaint</h3>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Please review all details carefully before submitting. Use the Back button to make changes.</p>
+          <div id="review-content"></div>
+        </div>
+
+        <div class="form-section" style="background:#fffbeb;border:1px solid #fde68a">
+          <h3 style="color:#92400e">âš  Confirmation</h3>
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+            <input type="checkbox" id="f-confirm" style="margin-top:3px;width:16px;height:16px;accent-color:var(--teal)"/>
+            <span style="font-size:13px">I confirm that the information provided is accurate and complete to the best of my knowledge. I understand that submitting a false or malicious complaint may result in disciplinary action.</span>
+          </label>
+          <div class="field-error" id="err-confirm" style="display:none;color:var(--red);font-size:12px;margin-top:8px"></div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <button class="btn btn-secondary" onclick="goStep(3)">â† Back</button>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-secondary" onclick="clearSubmitForm()">âœ• Clear &amp; Start Over</button>
+            <button class="btn btn-teal" id="submit-btn" onclick="submitComplaint()">
+              <span id="submit-btn-label">ðŸ“¤ Submit Complaint</span>
+            </button>
+          </div>
+        </div>
+      </div><!-- /step 4 -->
+
     </div><!-- /submit -->
 
     <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â• PAGE: ALL COMPLAINTS â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
@@ -922,17 +1094,21 @@ tr:last-child td{border-bottom:none}
 
 <!-- â•â•â•â• SUCCESS MODAL â•â•â•â• -->
 <div class="modal-overlay" id="success-modal">
-  <div class="modal" style="max-width:420px;text-align:center">
-    <div class="modal-body" style="padding:30px 24px">
-      <div style="font-size:48px;margin-bottom:12px">âœ…</div>
-      <h3 style="font-size:18px;color:var(--navy);margin-bottom:8px">Complaint Submitted</h3>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:6px">Your complaint reference number is:</p>
-      <div id="success-ref" style="font-size:22px;font-weight:800;color:var(--teal);margin:10px 0"></div>
-      <p style="font-size:12px;color:var(--muted);margin-bottom:20px">Keep this reference number to track your complaint status. A confirmation will be sent to your registered email.</p>
-      <div class="demo-banner" style="text-align:left;margin-bottom:16px">âš  <strong>DEMO:</strong> No data has been saved. This is a demonstration only.</div>
-      <div style="display:flex;gap:10px;justify-content:center">
-        <button class="btn btn-secondary" onclick="document.getElementById('success-modal').classList.remove('open')">Close</button>
-        <button class="btn btn-teal" onclick="document.getElementById('success-modal').classList.remove('open');nav('track',null);document.getElementById('track-input').value=document.getElementById('success-ref').textContent;trackSearch()">Track Complaint</button>
+  <div class="modal" style="max-width:480px">
+    <div class="modal-body" style="padding:30px 24px;text-align:center">
+      <div style="font-size:52px;margin-bottom:12px">âœ…</div>
+      <h3 style="font-size:20px;color:var(--navy);margin-bottom:6px">Complaint Successfully Submitted</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:4px">Your reference number is:</p>
+      <div id="success-ref" style="font-size:26px;font-weight:800;color:var(--teal);margin:10px 0;letter-spacing:1px"></div>
+      <div id="success-conf-badge" style="margin-bottom:10px"></div>
+      <div style="background:#f8fafc;border-radius:8px;padding:12px 16px;text-align:left;margin-bottom:14px;font-size:13px;line-height:1.8" id="success-details"></div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:6px">ðŸ“‹ Save your reference number to track your complaint via the <strong>Track Complaint</strong> page â€” no login required.</p>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:16px" id="success-email-note"></p>
+      <div class="demo-banner" style="text-align:left;margin-bottom:16px">âš  <strong>DEMO:</strong> This complaint has been added to the in-session list only. No data has been transmitted to any server.</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-secondary" onclick="closeSuccessModal()">Close</button>
+        <button class="btn btn-secondary" onclick="closeSuccessModal();nav('complaints',null)">ðŸ“‚ View All Complaints</button>
+        <button class="btn btn-teal" onclick="closeSuccessModal();nav('track',null);setTimeout(()=>{document.getElementById('track-input').value=document.getElementById('success-ref').textContent;trackSearch();},80)">ðŸ” Track This Complaint</button>
       </div>
     </div>
   </div>
@@ -1181,10 +1357,9 @@ function openComplaintModal(id){
 }
 function closeModal(){
   document.getElementById('complaint-modal').classList.remove('open');
-  document.getElementById('success-modal').classList.remove('open');
 }
 document.getElementById('complaint-modal').addEventListener('click',e=>{if(e.target.id==='complaint-modal')closeModal();});
-document.getElementById('success-modal').addEventListener('click',e=>{if(e.target.id==='success-modal')closeModal();});
+document.getElementById('success-modal').addEventListener('click',e=>{if(e.target.id==='success-modal')closeSuccessModal();});
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // TRACK COMPLAINT
@@ -1260,32 +1435,420 @@ function renderConfidential(){
 }
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// SUBMIT COMPLAINT
+// SUBMIT COMPLAINT â€” MULTI-STEP MODULE
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-let fileCount=0;
-function handleFiles(files){
-  const list=document.getElementById('file-list');
-  Array.from(files).forEach(f=>{
-    fileCount++;
-    const div=document.createElement('div');
-    div.style.cssText='display:flex;align-items:center;gap:10px;padding:8px 12px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;font-size:13px';
-    div.innerHTML=`<span>ðŸ“Ž</span><span style="flex:1">${f.name}</span><span style="color:var(--muted);font-size:12px">${(f.size/1024).toFixed(0)} KB</span><button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);font-size:16px;cursor:pointer">Ã—</button>`;
-    list.appendChild(div);
-  });
-}
-// Drag and drop
-const dz=document.getElementById('drop-zone');
-dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
-dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
-dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');handleFiles(e.dataTransfer.files)});
 
-function submitComplaint(e){
-  e.preventDefault();
-  const ref='ADU-2025-'+String(Math.floor(Math.random()*900)+100+115);
-  document.getElementById('success-ref').textContent=ref;
-  document.getElementById('success-modal').classList.add('open');
-  document.getElementById('submit-form').reset();
-  document.getElementById('file-list').innerHTML='';
+// â”€â”€ State â”€â”€
+let selectedFiles = [];       // validated File objects
+let currentStep = 1;
+const ALLOWED_TYPES = {
+  'application/pdf': '.pdf',
+  'image/jpeg': '.jpg/.jpeg',
+  'image/png': '.png',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx'
+};
+const ALLOWED_EXTS = ['.pdf','.jpg','.jpeg','.png','.docx'];
+const MAX_FILE_SIZE = 10 * 1024 * 1024;   // 10 MB
+const MAX_TOTAL_SIZE = 30 * 1024 * 1024;  // 30 MB
+const MAX_FILES = 5;
+
+// â”€â”€ Priority auto-suggestion by category â”€â”€
+const CAT_PRIORITY = {
+  'Safety': { priority:'High', hint:'âš¡ Safety-related complaints are auto-suggested as High priority. Please upgrade to Critical if there is immediate personal danger.' },
+  'Staff Conduct / Integrity': { priority:'High', hint:'âš¡ Integrity complaints are suggested as High. Adjust if necessary.' },
+  'ICT / System': { priority:'Medium', hint:'ðŸ’¡ ICT complaints default to Medium. Set to Critical if a major exam or service is affected.' },
+  'Facilities': { priority:'Medium', hint:'ðŸ’¡ Facilities complaints default to Medium. Set to High or Critical for structural/safety hazards.' },
+  'Finance / Billing': { priority:'Medium', hint:'ðŸ’¡ Finance complaints default to Medium.' },
+  'Customer Service': { priority:'Low', hint:'ðŸ’¡ Customer service complaints default to Low.' },
+  'Other': { priority:'Low', hint:'' }
+};
+
+function suggestPriority() {
+  const cat = document.getElementById('f-category').value;
+  const pri = document.getElementById('f-priority');
+  const hint = document.getElementById('priority-hint');
+  if (cat && CAT_PRIORITY[cat]) {
+    pri.value = CAT_PRIORITY[cat].priority;
+    hint.textContent = CAT_PRIORITY[cat].hint;
+    hint.style.display = CAT_PRIORITY[cat].hint ? 'block' : 'none';
+  } else {
+    hint.style.display = 'none';
+  }
+}
+
+// â”€â”€ Anonymous mode toggle â”€â”€
+function toggleAnonymous() {
+  const isAnon = document.getElementById('f-anonymous').checked;
+  document.getElementById('anon-banner').style.display = isAnon ? 'block' : 'none';
+  document.getElementById('anon-tracking-note').style.display = isAnon ? 'block' : 'none';
+  // Name and IC become optional in anonymous mode
+  document.getElementById('req-name').style.display = isAnon ? 'none' : 'inline';
+  document.getElementById('req-ic').style.display = isAnon ? 'none' : 'inline';
+  document.getElementById('req-email').style.display = isAnon ? 'none' : 'inline';
+  if (isAnon) {
+    document.getElementById('f-contact').value = 'None (Anonymous)';
+  }
+}
+
+// â”€â”€ Confidentiality radio highlight â”€â”€
+function updateConfUI() {
+  const val = document.querySelector('input[name="f-confidential"]:checked')?.value;
+  const map = { 'Normal':'conf-opt-normal', 'Confidential':'conf-opt-conf', 'Highly Confidential':'conf-opt-hconf' };
+  const colors = { 'Normal':'var(--teal)', 'Confidential':'var(--amber)', 'Highly Confidential':'var(--red)' };
+  ['conf-opt-normal','conf-opt-conf','conf-opt-hconf'].forEach(id => {
+    document.getElementById(id).style.borderColor = 'var(--border)';
+  });
+  if (val && map[val]) {
+    document.getElementById(map[val]).style.borderColor = colors[val];
+  }
+}
+
+// â”€â”€ Char counters â”€â”€
+function updateCharCount() {
+  const v = document.getElementById('f-title').value.length;
+  const el = document.getElementById('title-count');
+  el.textContent = v + ' / 120';
+  el.style.color = v > 100 ? 'var(--amber)' : 'var(--muted)';
+}
+function updateDescCount() {
+  const v = document.getElementById('f-desc').value.length;
+  const el = document.getElementById('desc-count');
+  el.textContent = v + ' chars (min 30)';
+  el.style.color = v < 30 ? 'var(--amber)' : 'var(--green)';
+}
+
+// â”€â”€ Step navigation â”€â”€
+function goStep(n) {
+  if (n > currentStep) {
+    if (!validateStep(currentStep)) return;
+  }
+  currentStep = n;
+  [1,2,3,4].forEach(i => {
+    document.getElementById('submit-step-'+i).style.display = i===n ? 'block' : 'none';
+    const ind = document.getElementById('step-ind-'+i);
+    ind.style.color = i===n ? 'var(--teal)' : (i < n ? 'var(--green)' : 'var(--muted)');
+    ind.style.background = i===n ? 'var(--teal-light)' : '';
+    ind.style.fontWeight = i===n ? '800' : '700';
+  });
+  if (n === 4) buildReview();
+  // hide error banner when moving
+  document.getElementById('form-error-banner').style.display = 'none';
+  document.getElementById('content').scrollTo(0, 0);
+}
+
+// â”€â”€ Field helpers â”€â”€
+function setFieldError(id, msg) {
+  const el = document.getElementById('err-'+id);
+  const inp = document.getElementById('f-'+id);
+  if (!el) return;
+  if (msg) {
+    el.textContent = msg;
+    el.style.display = 'block';
+    if (inp) inp.style.borderColor = 'var(--red)';
+  } else {
+    el.style.display = 'none';
+    if (inp) inp.style.borderColor = '';
+  }
+}
+function clearFieldErrors(...ids) {
+  ids.forEach(id => setFieldError(id, null));
+}
+
+// â”€â”€ Step validation â”€â”€
+function validateStep(step) {
+  let ok = true;
+  if (step === 1) {
+    const isAnon = document.getElementById('f-anonymous').checked;
+    clearFieldErrors('name','ic','email');
+    if (!isAnon) {
+      const name = document.getElementById('f-name').value.trim();
+      if (!name) { setFieldError('name','Full name is required.'); ok=false; }
+      const ic = document.getElementById('f-ic').value.trim();
+      if (!ic) { setFieldError('ic','IC / Staff / Student number is required.'); ok=false; }
+      const email = document.getElementById('f-email').value.trim();
+      if (!email) { setFieldError('email','Email address is required.'); ok=false; }
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setFieldError('email','Please enter a valid email address.'); ok=false; }
+    }
+  }
+  if (step === 2) {
+    clearFieldErrors('category','date','location','title','desc');
+    const cat = document.getElementById('f-category').value;
+    if (!cat) { setFieldError('category','Please select a complaint category.'); ok=false; }
+    const date = document.getElementById('f-date').value;
+    if (!date) { setFieldError('date','Incident date is required.'); ok=false; }
+    else {
+      const d = new Date(date); const today = new Date();
+      if (d > today) { setFieldError('date','Incident date cannot be in the future.'); ok=false; }
+    }
+    const loc = document.getElementById('f-location').value.trim();
+    if (!loc) { setFieldError('location','Location or department is required.'); ok=false; }
+    const title = document.getElementById('f-title').value.trim();
+    if (!title) { setFieldError('title','Complaint title is required.'); ok=false; }
+    else if (title.length < 10) { setFieldError('title','Title must be at least 10 characters.'); ok=false; }
+    const desc = document.getElementById('f-desc').value.trim();
+    if (!desc) { setFieldError('desc','Description is required.'); ok=false; }
+    else if (desc.length < 30) { setFieldError('desc','Description must be at least 30 characters.'); ok=false; }
+  }
+  if (!ok) {
+    const banner = document.getElementById('form-error-banner');
+    const txt = document.getElementById('form-error-text');
+    txt.textContent = step === 1
+      ? 'Please fill in all required fields before continuing.'
+      : 'Please correct the highlighted errors before continuing.';
+    banner.style.display = 'flex';
+    document.getElementById('content').scrollTo(0,0);
+  }
+  return ok;
+}
+
+// â”€â”€ File validation and handling â”€â”€
+function handleFiles(files) {
+  const errors = [];
+  Array.from(files).forEach(f => {
+    const ext = '.' + f.name.split('.').pop().toLowerCase();
+    const mimeOk = Object.keys(ALLOWED_TYPES).includes(f.type);
+    const extOk = ALLOWED_EXTS.includes(ext);
+    if (!mimeOk && !extOk) {
+      errors.push(`"${f.name}" â€” unsupported file type. Allowed: PDF, JPG, JPEG, PNG, DOCX.`);
+      return;
+    }
+    if (f.size > MAX_FILE_SIZE) {
+      errors.push(`"${f.name}" exceeds the 10 MB per-file limit (${(f.size/1024/1024).toFixed(1)} MB).`);
+      return;
+    }
+    if (selectedFiles.length >= MAX_FILES) {
+      errors.push(`Maximum ${MAX_FILES} files allowed. "${f.name}" was not added.`);
+      return;
+    }
+    const totalCurrent = selectedFiles.reduce((a,x) => a + x.size, 0);
+    if (totalCurrent + f.size > MAX_TOTAL_SIZE) {
+      errors.push(`Adding "${f.name}" would exceed the 30 MB total attachment limit.`);
+      return;
+    }
+    // Check duplicate name
+    if (selectedFiles.find(x => x.name === f.name)) {
+      errors.push(`"${f.name}" is already in the list.`);
+      return;
+    }
+    selectedFiles.push(f);
+  });
+  // Reset input so same file can be re-selected after removal
+  document.getElementById('file-input').value = '';
+
+  const errEl = document.getElementById('upload-error');
+  const errTxt = document.getElementById('upload-error-text');
+  if (errors.length) {
+    errTxt.innerHTML = errors.map(e => `â€¢ ${e}`).join('<br/>');
+    errEl.style.display = 'flex';
+  } else {
+    errEl.style.display = 'none';
+  }
+  renderFileList();
+}
+
+function removeFile(idx) {
+  selectedFiles.splice(idx, 1);
+  document.getElementById('upload-error').style.display = 'none';
+  renderFileList();
+}
+
+function renderFileList() {
+  const list = document.getElementById('file-list');
+  const summary = document.getElementById('upload-summary');
+  if (!selectedFiles.length) {
+    list.innerHTML = '';
+    summary.style.display = 'none';
+    return;
+  }
+  const typeIcon = ext => ({ pdf:'ðŸ“„', jpg:'ðŸ–¼ï¸', jpeg:'ðŸ–¼ï¸', png:'ðŸ–¼ï¸', docx:'ðŸ“' }[ext] || 'ðŸ“Ž');
+  list.innerHTML = selectedFiles.map((f, i) => {
+    const ext = f.name.split('.').pop().toLowerCase();
+    const kb = f.size < 1024*1024 ? (f.size/1024).toFixed(0)+' KB' : (f.size/1024/1024).toFixed(1)+' MB';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;font-size:13px">
+      <span style="font-size:18px">${typeIcon(ext)}</span>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</span>
+      <span style="color:var(--muted);font-size:12px;white-space:nowrap">${kb}</span>
+      <button onclick="removeFile(${i})" title="Remove" style="background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;line-height:1;padding:0 2px">Ã—</button>
+    </div>`;
+  }).join('');
+  const total = selectedFiles.reduce((a,f) => a+f.size, 0);
+  summary.textContent = `${selectedFiles.length} file(s) selected â€” ${(total/1024/1024).toFixed(1)} MB total`;
+  summary.style.display = 'block';
+}
+
+// Drag-and-drop wiring (deferred so DOM is ready)
+document.addEventListener('DOMContentLoaded', () => {
+  const dz = document.getElementById('drop-zone');
+  if (dz) {
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+    dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag'); handleFiles(e.dataTransfer.files); });
+  }
+});
+
+// â”€â”€ Build review panel â”€â”€
+function buildReview() {
+  const isAnon = document.getElementById('f-anonymous').checked;
+  const confVal = document.querySelector('input[name="f-confidential"]:checked')?.value || 'Normal';
+  const confLabels = {
+    'Normal': 'ðŸŒ Normal',
+    'Confidential': 'ðŸ”’ Confidential',
+    'Highly Confidential': 'ðŸ” Highly Confidential'
+  };
+  const confColors = { 'Normal':'var(--teal)', 'Confidential':'var(--amber)', 'Highly Confidential':'var(--red)' };
+  const rows = [
+    ['Complainant', isAnon ? '<em style="color:var(--muted)">Anonymous</em>' : (document.getElementById('f-name').value || 'â€”')],
+    ['ID / IC', isAnon ? '<em style="color:var(--muted)">Not provided</em>' : (document.getElementById('f-ic').value || 'â€”')],
+    ['Email', isAnon ? '<em style="color:var(--muted)">Not provided</em>' : (document.getElementById('f-email').value || 'â€”')],
+    ['Department', document.getElementById('f-dept').value || 'â€”'],
+    ['Category', document.getElementById('f-category').value || 'â€”'],
+    ['Priority', document.getElementById('f-priority').value],
+    ['Incident Date', document.getElementById('f-date').value + (document.getElementById('f-time').value ? ' at ' + document.getElementById('f-time').value : '')],
+    ['Location', document.getElementById('f-location').value || 'â€”'],
+    ['Title', `<strong>${document.getElementById('f-title').value}</strong>`],
+    ['Description', `<div style="white-space:pre-wrap;color:var(--text)">${document.getElementById('f-desc').value}</div>`],
+    ['Expected Resolution', document.getElementById('f-expected').value || 'â€”'],
+    ['Confidentiality', `<span style="font-weight:700;color:${confColors[confVal]}">${confLabels[confVal]}</span>`],
+    ['Attached Files', selectedFiles.length ? selectedFiles.map(f=>f.name).join(', ') : 'None'],
+  ];
+  document.getElementById('review-content').innerHTML = rows.map(([k,v]) =>
+    `<div style="display:grid;grid-template-columns:160px 1fr;gap:8px;padding:7px 0;border-bottom:1px solid #f0f4f8;font-size:13px">
+       <span style="color:var(--muted);font-weight:600">${k}</span><span>${v}</span>
+     </div>`
+  ).join('');
+}
+
+// â”€â”€ Final submission â”€â”€
+function submitComplaint() {
+  const confirmBox = document.getElementById('f-confirm');
+  const errConfirm = document.getElementById('err-confirm');
+  if (!confirmBox.checked) {
+    errConfirm.textContent = 'You must confirm the declaration above before submitting.';
+    errConfirm.style.display = 'block';
+    return;
+  }
+  errConfirm.style.display = 'none';
+
+  // Show loading state
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  document.getElementById('submit-btn-label').textContent = 'â³ Submittingâ€¦';
+
+  setTimeout(() => {
+    // Generate unique reference number
+    const year = new Date().getFullYear();
+    const existingIds = COMPLAINTS.map(c => {
+      const m = c.id.match(/EA-\d{4}-(\d+)/);
+      return m ? parseInt(m[1]) : 0;
+    });
+    const nextNum = Math.max(0, ...existingIds) + 1 + Math.floor(Math.random()*3);
+    const ref = `EA-${year}-${String(nextNum).padStart(4,'0')}`;
+
+    const isAnon = document.getElementById('f-anonymous').checked;
+    const confVal = document.querySelector('input[name="f-confidential"]:checked')?.value || 'Normal';
+    const slaMap = { Critical:1, High:2, Medium:5, Low:10 };
+    const priority = document.getElementById('f-priority').value;
+    const newComplaint = {
+      id: ref,
+      title: document.getElementById('f-title').value.trim(),
+      category: document.getElementById('f-category').value,
+      priority,
+      status: 'New',
+      date: document.getElementById('f-date').value,
+      complainant: isAnon ? 'Anonymous' : document.getElementById('f-name').value.trim(),
+      dept: document.getElementById('f-dept').value.trim() || 'General',
+      location: document.getElementById('f-location').value.trim(),
+      desc: document.getElementById('f-desc').value.trim(),
+      assigned: null,
+      resolvedDate: null,
+      sla: slaMap[priority] || 5,
+      daysUsed: 0,
+      confidential: confVal !== 'Normal',
+      confidentialLevel: confVal,
+      attachments: selectedFiles.length,
+    };
+
+    // Add to live state
+    COMPLAINTS.push(newComplaint);
+    // Add placeholder doc entries if files attached
+    selectedFiles.forEach((f, i) => {
+      const ext = f.name.split('.').pop().toLowerCase();
+      const typeMap = { pdf:'PDF', jpg:'Image', jpeg:'Image', png:'Image', docx:'Word' };
+      DOCUMENTS.push({
+        id: `DOC-${String(DOCUMENTS.length+1).padStart(3,'0')}`,
+        complaint: ref,
+        name: f.name,
+        type: typeMap[ext] || 'File',
+        size: f.size < 1024*1024 ? (f.size/1024).toFixed(0)+' KB' : (f.size/1024/1024).toFixed(1)+' MB',
+        uploaded: new Date().toISOString().slice(0,10),
+        uploader: isAnon ? 'Anonymous' : document.getElementById('f-name').value.trim() || 'Complainant',
+      });
+    });
+
+    // Update dashboard badge
+    const newCount = COMPLAINTS.filter(c=>c.status==='New').length;
+    const badge = document.getElementById('badge-complaints');
+    if (badge) badge.textContent = newCount;
+    renderRecentTable();
+
+    // Populate success modal
+    const confColors = { 'Normal':'var(--teal)', 'Confidential':'var(--amber)', 'Highly Confidential':'var(--red)' };
+    const confLabels = { 'Normal':'ðŸŒ Normal', 'Confidential':'ðŸ”’ Confidential', 'Highly Confidential':'ðŸ” Highly Confidential' };
+    document.getElementById('success-ref').textContent = ref;
+    document.getElementById('success-conf-badge').innerHTML =
+      `<span class="badge" style="background:${confColors[confVal]}22;color:${confColors[confVal]};border:1px solid ${confColors[confVal]}44">${confLabels[confVal]}</span>`;
+    document.getElementById('success-details').innerHTML = `
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:4px 10px;font-size:13px">
+        <span style="color:var(--muted)">Category:</span><strong>${newComplaint.category}</strong>
+        <span style="color:var(--muted)">Priority:</span><strong>${newComplaint.priority}</strong>
+        <span style="color:var(--muted)">Status:</span><span class="badge b-new">New</span>
+        <span style="color:var(--muted)">SLA Target:</span><strong>${newComplaint.sla} working day(s)</strong>
+        ${newComplaint.attachments ? `<span style="color:var(--muted)">Attachments:</span><strong>${newComplaint.attachments} file(s) (demo â€” not uploaded)</strong>` : ''}
+      </div>`;
+    document.getElementById('success-email-note').textContent = isAnon
+      ? 'You submitted anonymously. Use your reference number to track progress without creating an account.'
+      : `A confirmation email would be sent to ${document.getElementById('f-email').value} in production.`;
+
+    document.getElementById('success-modal').classList.add('open');
+
+    // Reset form
+    btn.disabled = false;
+    document.getElementById('submit-btn-label').textContent = 'ðŸ“¤ Submit Complaint';
+    clearSubmitForm();
+  }, 900); // simulated processing delay
+}
+
+function clearSubmitForm() {
+  ['f-anonymous','f-name','f-ic','f-email','f-phone','f-dept',
+   'f-category','f-date','f-time','f-location','f-persons',
+   'f-title','f-desc','f-expected','f-confirm'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el.type==='checkbox'||el.type==='radio') el.checked = false;
+    else el.value = '';
+  });
+  document.querySelector('input[name="f-confidential"][value="Normal"]').checked = true;
+  document.getElementById('f-priority').value = 'Medium';
+  document.getElementById('f-contact').value = 'Email';
+  selectedFiles = [];
+  renderFileList();
+  document.getElementById('upload-error').style.display = 'none';
+  document.getElementById('form-error-banner').style.display = 'none';
+  document.getElementById('anon-banner').style.display = 'none';
+  document.getElementById('anon-tracking-note').style.display = 'none';
+  document.getElementById('priority-hint').style.display = 'none';
+  document.getElementById('title-count').textContent = '0 / 120';
+  document.getElementById('desc-count').textContent = '0 chars (min 30)';
+  updateConfUI();
+  ['req-name','req-ic','req-email'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'inline';
+  });
+  goStep(1);
+}
+
+function closeSuccessModal() {
+  document.getElementById('success-modal').classList.remove('open');
 }
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
